@@ -1,7 +1,7 @@
 module.exports = {
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: 'root',
     db: 'Split_the_bill',
     dialect: 'mysql',
     pool: {

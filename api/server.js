@@ -1,5 +1,7 @@
 const express = require('express')
+
 const authRouter = require('./routers/authRouter')
+const usersRouter = require('./routers/usersRouter')
 
 const app = express()
 
@@ -12,6 +14,7 @@ app.use(express.urlencoded({ extended: true }))
 
 // Routing
 app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/users', usersRouter)
 
 
 
