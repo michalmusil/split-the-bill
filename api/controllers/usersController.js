@@ -1,10 +1,15 @@
 const { Op } = require('sequelize')
 const database = require('../models/database')
+const bcrypt = require('bcrypt')
+const dotenv = require('dotenv')
 
+dotenv.config()
 const users = database.users
 
 const getAllUsers = async (req, res) => {
     let filter = {}
+
+    const signedInUserId = req.user.id
 
     const { query, includeSelf } = req.query
     if (query){
@@ -15,15 +20,14 @@ const getAllUsers = async (req, res) => {
             ]
         }
     }
-    /*
-    if (includeSelf) {
+    if (includeSelf === false) {
         filter.id = {
-            [Op.ne]: userId
+            [Op.ne]: signedInUserId
         }
     }
-    */
     const filtered = await users.findAll({
-        where: filter
+        where: filter,
+        attributes: ['id', 'username', 'email']
     })
 
     res.status(200).send(filtered)
@@ -32,8 +36,7 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
     const userId = Number(req.params.id)
     if (userId !== 0 && !userId){
-        res.status(400).send()
-        return
+        return res.status(400).send()
     }
     let user = await users.findOne({
         where: {
@@ -41,42 +44,27 @@ const getUserById = async (req, res) => {
         }
     })
     if (user){
-        res.status(200).send(user)
-        return
+        return res.status(200).send({
+            id: user.id,
+            username: user.username,
+            email: user.email
+        })
     }
     res.status(404).send()
 }
 
-const addUser = async (req, res) => {
-    const { username, email, password } = req.body
-    
-    const passwordHash = password
-
-    if (username && email && password){
-        const newUser = await users.create({
-            username: username,
-            email: email,
-            passwordHash: passwordHash
-        })
-        res.status(201).send(newUser)
-        return
-    }
-    res.status(400).send()
-}
-
 const updateUser = async (req, res) => {
     const { id, username, email, password } = req.body
-    const loggedInUserId = 4
+    
+    const loggedInUserId = req.user.id
 
     if(id !== 0 && !Number(id)){
-        res.status(400).send()
-        return
+        return res.status(400).send()
     }
 
     // User can update only himself
     if (Number(id) !== loggedInUserId) {
-        res.status(403).send()
-        return
+        return res.status(403).send()
     }
 
     const user = await users.findOne({
@@ -86,39 +74,57 @@ const updateUser = async (req, res) => {
     })
 
     if (!user){
-        res.status(404).send()
-        return
+        return res.status(404).send()
     }
 
     if(username){
         user.username = username
     }
     if(email){
-        user.email = email
+        const existingUserWithEmail = await users.findOne({
+            where: {
+                email: email
+            }
+        })
+    
+        if (existingUserWithEmail != null){
+            return res.status(409).send({
+                message: "This e-mail is already taken"
+            })
+        } else {
+            user.email = email
+        }
     }
     if(password){
-        const newPasswordHash = password
-        user.passwordHash = newPasswordHash
+        const numberOfSaltRounds = 10
+        try{
+            const newPasswordHash = await bcrypt.hash(password, numberOfSaltRounds)
+            user.passwordHash = newPasswordHash
+        } catch(ex){
+            return res.status(400).send()
+        }
     }
 
     await user.save()
 
-    res.status(200).send(user)
+    res.status(200).send({
+        id: user.id,
+        username: user.username,
+        email: user.email
+    })
 }
 
 const deleteUser = async (req, res) => {
     const id = Number(req.params.id)
     if(id !== 0 && !id){
-        res.status(400).send()
-        return
+        return res.status(400).send()
     }
 
-    const loggedInUserId = 4
+    const loggedInUserId = req.user.id
 
     // User can delete only himself
     if (id !== loggedInUserId) {
-        res.status(403).send()
-        return
+        return res.status(403).send()
     }
 
     const user = await users.findOne({
@@ -128,20 +134,17 @@ const deleteUser = async (req, res) => {
     })
 
     if (!user){
-        res.status(404).send()
-        return
+        return res.status(404).send()
     }
 
     await user.destroy()
     res.status(200).send()
-
 }
 
 
 module.exports = {
     getAllUsers,
     getUserById,
-    addUser,
     updateUser,
     deleteUser
 }

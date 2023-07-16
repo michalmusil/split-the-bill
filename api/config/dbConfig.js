@@ -1,7 +1,10 @@
+const dotenv = require('dotenv')
+dotenv.config()
+
 module.exports = {
     host: 'localhost',
     user: 'root',
-    password: 'root',
+    password: process.env.DB_PASSWORD,
     db: 'Split_the_bill',
     dialect: 'mysql',
     pool: {

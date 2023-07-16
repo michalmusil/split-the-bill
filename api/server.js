@@ -1,9 +1,12 @@
 const express = require('express')
+const dotenv = require('dotenv')
 
+const jwtAuthentication = require('./middleware/jwtAuthentication')
 const authRouter = require('./routers/authRouter')
 const usersRouter = require('./routers/usersRouter')
 
 const app = express()
+dotenv.config()
 
 // Setup
 app.use(express.json())
@@ -12,8 +15,12 @@ app.use(express.urlencoded({ extended: true }))
 
 
 
-// Routing
+// Routing - unauthenticated endpoints
 app.use('/api/v1/auth', authRouter)
+
+
+// Routing - authenticated endpoints
+app.use(jwtAuthentication)
 app.use('/api/v1/users', usersRouter)
 
 
