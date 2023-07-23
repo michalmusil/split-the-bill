@@ -1,50 +1,20 @@
-const { Op } = require('sequelize')
-const database = require('../models/database')
 const bcrypt = require('bcrypt')
 const dotenv = require('dotenv')
+const usersRepository = require('../models/repositories/usersRepository')
 
 dotenv.config()
-const users = database.users
-const shoppings = database.shoppings
 
 const getAllUsers = async (req, res) => {
-    let where = {}
-    let include = []
-
     const signedInUserId = req.user.id
 
     const { searchString, includeSelf, shoppingId } = req.query
-    const shoppingIdNumber = Number(shoppingId)
     const dontIncludeSelf = includeSelf === 'false' || includeSelf === 'False'
-
-    if (searchString != null){
-        where = {
-            [Op.or]: [
-                { email : {[Op.substring]: searchString} },
-                { username : {[Op.substring]: searchString} }
-            ]
-        }
-    }
-    if (dontIncludeSelf) {
-        where.id = {
-            [Op.ne]: signedInUserId
-        }
-    }
-    if (shoppingIdNumber || shoppingIdNumber === 0){
-        include.push({
-            model: shoppings,
-            where: {
-                id: shoppingIdNumber
-            }
-        })
+    let excludeUserId = null
+    if(dontIncludeSelf){
+        excludeUserId = signedInUserId
     }
 
-
-    const filtered = await users.findAll({
-        where: where,
-        include: include,
-        attributes: ['id', 'username', 'email']
-    })
+    const filtered = await usersRepository.getUsers(searchString, shoppingId, excludeUserId)
 
     res.status(200).send(filtered)
 }
@@ -54,19 +24,17 @@ const getUserById = async (req, res) => {
     if (userId !== 0 && !userId){
         return res.status(400).send({ message: 'Invalid user id' })
     }
-    let user = await users.findOne({
-        where: {
-            id: userId
-        }
-    })
-    if (user != null){
-        return res.status(200).send({
-            id: user.id,
-            username: user.username,
-            email: user.email
-        })
+    let user = await usersRepository.getUserById(userId)
+    
+    if (user == null){
+        return res.status(404).send({ message: 'User with this id was not found' })
     }
-    return res.status(404).send({ message: 'User with this id was not found' })
+
+    return res.status(200).send({
+        id: user.id,
+        username: user.username,
+        email: user.email
+    })
 }
 
 const updateUser = async (req, res) => {
@@ -80,53 +48,44 @@ const updateUser = async (req, res) => {
 
     // User can update only himself
     if (Number(id) !== loggedInUserId) {
-        return res.status(403).send()
+        return res.status(403).send({ message: 'User can only update him/herself' })
     }
 
-    const user = await users.findOne({
-        where: {
-            id: Number(id)
-        }
-    })
+    const user = await usersRepository.getUserById(id)
+    let newPasswordHash = null
 
-    if (!user){
+    if (user == null){
         return res.status(404).send({ message: 'User with this id was not found' })
     }
-
-    if(username){
-        user.username = username
-    }
     if(email){
-        const existingUserWithEmail = await users.findOne({
-            where: {
-                email: email
-            }
-        })
-    
+        const existingUserWithEmail = await usersRepository.getUserByEmail(email)    
         if (existingUserWithEmail != null){
             return res.status(409).send({
                 message: "This e-mail is already taken"
             })
-        } else {
-            user.email = email
         }
     }
     if(password){
         const numberOfSaltRounds = 10
         try{
-            const newPasswordHash = await bcrypt.hash(password, numberOfSaltRounds)
-            user.passwordHash = newPasswordHash
+            newPasswordHash = await bcrypt.hash(password, numberOfSaltRounds)
         } catch(ex){
             return res.status(500).send({ message: 'Could not process the new password' })
         }
     }
 
-    await user.save()
+    const updated = await usersRepository.updateUser(user.id, username, email, newPasswordHash)
+
+    if(!updated){
+        return res.status(500).send({ message: "Could not update user" })
+    }
+
+    const updatedUser = await usersRepository.getUserById(user.id)
 
     res.status(200).send({
-        id: user.id,
-        username: user.username,
-        email: user.email
+        id: updatedUser.id,
+        username: updatedUser.username,
+        email: updatedUser.email
     })
 }
 
@@ -143,17 +102,12 @@ const deleteUser = async (req, res) => {
         return res.status(403).send({ message: 'User can only delete his/her own account' })
     }
 
-    const user = await users.findOne({
-        where: {
-            id: Number(id)
-        }
-    })
+    const deleted = await usersRepository.deleteUser(id)
 
-    if (!user){
-        return res.status(404).send({ message: 'User with this id was not found' })
+    if (!deleted){
+        return res.status(500).send({ message: 'Could not delete user' })
     }
 
-    await user.destroy()
     res.status(200).send()
 }
 

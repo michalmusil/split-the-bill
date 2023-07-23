@@ -1,10 +1,9 @@
-const database = require('../models/database')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const dotenv = require('dotenv')
+const usersRepository = require('../models/repositories/usersRepository')
 
 dotenv.config()
-const users = database.users
 
 const login = async (req, res) => {
     const { email, password } = req.body
@@ -13,11 +12,7 @@ const login = async (req, res) => {
         return res.status(400).send({ message: 'You must input both email and password' })
     }
 
-    const foundUser = await users.findOne({
-        where: {
-            email: email
-        }
-    })
+    const foundUser = await usersRepository.getUserByEmail(email)
 
     if (foundUser == null){
         return res.status(401).send({ message: 'Unauthorized' })
@@ -55,11 +50,7 @@ const register = async (req, res) => {
         return res.status(400).send()
     }
 
-    const existingUserWithEmail = await users.findOne({
-        where: {
-            email: email
-        }
-    })
+    const existingUserWithEmail = await usersRepository.getUserByEmail(email)
 
     if (existingUserWithEmail != null){
         return res.status(409).send({ message: "This e-mail is already taken" })
@@ -73,11 +64,9 @@ const register = async (req, res) => {
         return res.status(500).send({ message: 'Could not process the new password' })
     }
 
-    const newUser = await users.create({
-        username: username,
-        email: email,
-        passwordHash: passwordHash
-    })
+    const newUserId = await usersRepository.addUser(username, email, passwordHash)
+    const newUser = await usersRepository.getUserById(newUserId)
+    
     res.status(201).send({
         id: newUser.id,
         username: newUser.username,
