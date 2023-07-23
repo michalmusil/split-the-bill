@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS Split_the_bill;
+
 CREATE TABLE `Users` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
@@ -7,7 +9,7 @@ CREATE TABLE `Users` (
   `updatedAt` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-)
+);
 
 CREATE TABLE `Shoppings` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -20,7 +22,7 @@ CREATE TABLE `Shoppings` (
   PRIMARY KEY (`id`),
   KEY `creatorId` (`creatorId`),
   CONSTRAINT `Shoppings_ibfk_1` FOREIGN KEY (`creatorId`) REFERENCES `Users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-)
+);
 
 CREATE TABLE `Products` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -34,7 +36,7 @@ CREATE TABLE `Products` (
   UNIQUE KEY `name` (`name`),
   KEY `creatorId` (`creatorId`),
   CONSTRAINT `Products_ibfk_1` FOREIGN KEY (`creatorId`) REFERENCES `Users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-)
+);
 
 CREATE TABLE `Users_shoppings` (
   `userId` int NOT NULL,
@@ -46,7 +48,7 @@ CREATE TABLE `Users_shoppings` (
   KEY `shoppingId` (`shoppingId`),
   CONSTRAINT `Users_shoppings_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `Users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `Users_shoppings_ibfk_2` FOREIGN KEY (`shoppingId`) REFERENCES `Shoppings` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-)
+);
 
 CREATE TABLE `Shoppings_products` (
   `shoppingId` int NOT NULL,
@@ -60,7 +62,7 @@ CREATE TABLE `Shoppings_products` (
   KEY `productId` (`productId`),
   CONSTRAINT `Shoppings_products_ibfk_1` FOREIGN KEY (`shoppingId`) REFERENCES `Shoppings` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `Shoppings_products_ibfk_2` FOREIGN KEY (`productId`) REFERENCES `Products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-)
+);
 
 CREATE TABLE `Purchases` (
   `userId` int NOT NULL,
@@ -74,4 +76,4 @@ CREATE TABLE `Purchases` (
   CONSTRAINT `Purchases_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `Users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `Purchases_ibfk_2` FOREIGN KEY (`shoppingId`) REFERENCES `Shoppings` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `Purchases_ibfk_3` FOREIGN KEY (`productId`) REFERENCES `Products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-)
+);

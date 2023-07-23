@@ -4,7 +4,7 @@ const dotenv = require('dotenv')
 const jwtAuthentication = require('./middleware/jwtAuthentication')
 const authRouter = require('./routers/authRouter')
 const usersRouter = require('./routers/usersRouter')
-//const productsRouter = require('./routers/productsRouter')
+const productsRouter = require('./routers/productsRouter')
 //const shoppingsRouter = require('./routers/shoppingsRouter')
 
 const app = express()
@@ -24,7 +24,7 @@ app.use('/api/v1/auth', authRouter)
 // Routing - authenticated endpoints
 app.use(jwtAuthentication)
 app.use('/api/v1/users', usersRouter)
-//app.use('/api/v1/products', productsRouter)
+app.use('/api/v1/products', productsRouter)
 //app.use('/api/v1/shoppings', shoppingsRouter)
 
 

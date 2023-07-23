@@ -1,5 +1,4 @@
 const mysql = require('mysql2')
-const fs = require('fs')
 const dotenv = require('dotenv')
 dotenv.config()
 
@@ -11,11 +10,5 @@ const databasePool = mysql.createPool({
     database: process.env.DB_NAME
 }).promise()
 
-
-/*
-// CREATE DATABASE
-const createQuery = fs.readFileSync('./schema.sql')
-await databasePool.query(createQuery)
-*/
 
 module.exports = databasePool
