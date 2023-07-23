@@ -40,8 +40,8 @@ const getProducts = async (req, res) => {
 const getProductById = async (req, res) => {
     const productId = Number(req.params.id)
     
-    if (productId == null){
-        return res.status(400).send({ message: 'Invalid parameter of id' })
+    if (!productId && productId !== 0){
+        return res.status(400).send({ message: 'Invalid product id' })
     }
 
     const found = await products.findOne({
@@ -95,8 +95,8 @@ const addProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
     const productId = Number(req.params.id)
     
-    if (productId == null){
-        return res.status(400).send('Invalid parameter of id')
+    if (!productId && productId !== 0){
+        return res.status(400).send('Invalid product id')
     }
 
     const found = await products.findOne({

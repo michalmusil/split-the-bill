@@ -10,7 +10,7 @@ const login = async (req, res) => {
     const { email, password } = req.body
 
     if (email == null || password == null){
-        return res.status(400).send()
+        return res.status(400).send({ message: 'You must input both email and password' })
     }
 
     const foundUser = await users.findOne({
@@ -20,18 +20,18 @@ const login = async (req, res) => {
     })
 
     if (foundUser == null){
-        return res.status(401).send()
+        return res.status(401).send({ message: 'Unauthorized' })
     }
 
     let passwordValid = false
     try{
         passwordValid = await bcrypt.compare(password, foundUser.passwordHash)
     } catch(ex){
-        return res.status(401).send()
+        return res.status(401).send({ message: 'Unauthorized' })
     }
 
     if (!passwordValid){
-        return res.status(401).send()
+        return res.status(401).send({ message: 'Unauthorized' })
     }
 
     const userForToken = {
@@ -62,11 +62,7 @@ const register = async (req, res) => {
     })
 
     if (existingUserWithEmail != null){
-        return res.status(409).send(
-            {
-                message: "This e-mail is already taken"
-            }
-        )
+        return res.status(409).send({ message: "This e-mail is already taken" })
     }
     
     let passwordHash = ""
@@ -74,7 +70,7 @@ const register = async (req, res) => {
         const numberOfSaltRounds = 10
         passwordHash = await bcrypt.hash(password, numberOfSaltRounds)
     } catch(ex){
-        return res.status(400).send()
+        return res.status(500).send({ message: 'Could not process the new password' })
     }
 
     const newUser = await users.create({
@@ -82,7 +78,11 @@ const register = async (req, res) => {
         email: email,
         passwordHash: passwordHash
     })
-    res.status(201).send(newUser)
+    res.status(201).send({
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email
+    })
 }
 
 module.exports = {

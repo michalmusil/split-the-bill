@@ -5,28 +5,44 @@ const dotenv = require('dotenv')
 
 dotenv.config()
 const users = database.users
+const shoppings = database.shoppings
 
 const getAllUsers = async (req, res) => {
-    let filter = {}
+    let where = {}
+    let include = []
 
     const signedInUserId = req.user.id
 
-    const { query, includeSelf } = req.query
-    if (query){
-        filter = {
+    const { searchString, includeSelf, shoppingId } = req.query
+    const shoppingIdNumber = Number(shoppingId)
+    const dontIncludeSelf = includeSelf === 'false' || includeSelf === 'False'
+
+    if (searchString != null){
+        where = {
             [Op.or]: [
-                { email : {[Op.substring]: query} },
-                { username : {[Op.substring]: query} }
+                { email : {[Op.substring]: searchString} },
+                { username : {[Op.substring]: searchString} }
             ]
         }
     }
-    if (includeSelf === false) {
-        filter.id = {
+    if (dontIncludeSelf) {
+        where.id = {
             [Op.ne]: signedInUserId
         }
     }
+    if (shoppingIdNumber || shoppingIdNumber === 0){
+        include.push({
+            model: shoppings,
+            where: {
+                id: shoppingIdNumber
+            }
+        })
+    }
+
+
     const filtered = await users.findAll({
-        where: filter,
+        where: where,
+        include: include,
         attributes: ['id', 'username', 'email']
     })
 
@@ -36,21 +52,21 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
     const userId = Number(req.params.id)
     if (userId !== 0 && !userId){
-        return res.status(400).send()
+        return res.status(400).send({ message: 'Invalid user id' })
     }
     let user = await users.findOne({
         where: {
             id: userId
         }
     })
-    if (user){
+    if (user != null){
         return res.status(200).send({
             id: user.id,
             username: user.username,
             email: user.email
         })
     }
-    res.status(404).send()
+    return res.status(404).send({ message: 'User with this id was not found' })
 }
 
 const updateUser = async (req, res) => {
@@ -59,7 +75,7 @@ const updateUser = async (req, res) => {
     const loggedInUserId = req.user.id
 
     if(id !== 0 && !Number(id)){
-        return res.status(400).send()
+        return res.status(400).send({ message: 'Invalid user id' })
     }
 
     // User can update only himself
@@ -74,7 +90,7 @@ const updateUser = async (req, res) => {
     })
 
     if (!user){
-        return res.status(404).send()
+        return res.status(404).send({ message: 'User with this id was not found' })
     }
 
     if(username){
@@ -101,7 +117,7 @@ const updateUser = async (req, res) => {
             const newPasswordHash = await bcrypt.hash(password, numberOfSaltRounds)
             user.passwordHash = newPasswordHash
         } catch(ex){
-            return res.status(400).send()
+            return res.status(500).send({ message: 'Could not process the new password' })
         }
     }
 
@@ -117,14 +133,14 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     const id = Number(req.params.id)
     if(id !== 0 && !id){
-        return res.status(400).send()
+        return res.status(400).send({ message: 'Invalid user id' })
     }
 
     const loggedInUserId = req.user.id
 
     // User can delete only himself
     if (id !== loggedInUserId) {
-        return res.status(403).send()
+        return res.status(403).send({ message: 'User can only delete his/her own account' })
     }
 
     const user = await users.findOne({
@@ -134,7 +150,7 @@ const deleteUser = async (req, res) => {
     })
 
     if (!user){
-        return res.status(404).send()
+        return res.status(404).send({ message: 'User with this id was not found' })
     }
 
     await user.destroy()
