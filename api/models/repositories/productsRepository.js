@@ -39,7 +39,12 @@ const getProductById = async (id) => {
     if (!Number(id) && id !== 0){
         return null
     }
-    const [foundProduct] = await database.query(`SELECT * FROM Products WHERE id = ?`,[id])
+    const [foundProduct] = await database.query(`
+    SELECT id, name, imagePath, description, creatorId 
+    FROM Products 
+    WHERE id = ?
+    `,
+    [id])
     return foundProduct[0]
 }
 
@@ -51,7 +56,12 @@ const getProductByName = async (name) => {
         return null
     }
 
-    const [foundProduct] = await database.query(`SELECT * FROM Products WHERE name = ?`,[name])
+    const [foundProduct] = await database.query(`
+    SELECT id, name, imagePath, description, creatorId 
+    FROM Products 
+    WHERE name = ?
+    `
+    ,[name])
     return foundProduct[0]
 }
 
@@ -88,7 +98,7 @@ const updateProduct = async (productId, name, imagePath, description) => {
         setStatements.push("imagePath = ?")
         setValues.push(imagePath)
     }
-    if(description !== null){
+    if(typeof description !== 'undefined'){
         setStatements.push("description = ?")
         setValues.push(description)
     }

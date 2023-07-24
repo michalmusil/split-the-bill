@@ -7,6 +7,7 @@ CREATE TABLE `Users` (
   `passwordHash` varchar(1000) NOT NULL,
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL,
+  `isDeleted` BOOLEAN NOT NULL DEFAULT false, 
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 );

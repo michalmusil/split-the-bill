@@ -1,49 +1,14 @@
-const { user } = require('../config/dbConfig')
-const database = require('../models/database')
-const { Op } = require('sequelize')
-
-const shoppings = database.shoppings
-const userShoppings = database.userShoppings
-const users = database.users
-const shoppingProducts = database.shoppingProducts
+const shoppingsRepository = require('../models/repositories/shoppingsRepository')
 
 
-const getShoppingsOfUser = async (req, res) => {
+const getShoppings = async (req, res) => {
     const loggedInUserId = req.user.id
 
-    const nameQuery = req.query.name
+    const searchQuery = req.query.search
 
-    const include = [
-        {
-            model: users,
-            where: {
-                id: loggedInUserId
-            }
-        }
-    ]
-    const where = {}
+    const foundShoppings = await shoppingsRepository.getShoppings(loggedInUserId, searchQuery)
 
-    if (nameQuery != null){
-        where.name = { [Op.substring]: nameQuery }
-    }
-
-    const foundShoppings = await shoppings.findAll({
-        where: where,
-        include: include,
-        attributes: ['id', 'name', 'dueDateTime', 'description', 'UserId']
-    })
-
-    const shoppingsAdjusted = foundShoppings.map(shopping => 
-        ({
-            id: shopping.id,
-            name: shopping.name,
-            dueDateTime: shopping.dueDateTime,
-            description: shopping.description,
-            UserId: shopping.UserId
-        })
-    )
-
-    return res.status(200).send(shoppingsAdjusted)
+    return res.status(200).send(foundShoppings)
 }
 
 const getShoppingById = async (req, res) => {
@@ -54,86 +19,48 @@ const getShoppingById = async (req, res) => {
     if (shoppingId !== 0 && !shoppingId){
         return res.status(400).send({ message: 'Invalid shopping id' })
     }
-    let shoppingExists = await shoppings.findOne({
-        where: {
-            id: shoppingId
-        }
-    })
+    
+    const foundShopping = await shoppingsRepository.getShoppingById(shoppingId, loggedInUserId)
 
-    if (shoppingExists == null){
-        return res.status(404).send({ message: 'Shopping with this id was not found' })
+    if (foundShopping != null){
+        return res.status(200).send(foundShopping)
     }
-
-    let shoppingOfUser = await shoppings.findOne({
-        where: {
-            id: shoppingId
-        },
-        include: [
-            { 
-                model: users,
-                where: { id: loggedInUserId }
-            }
-        ]
-    })
-
-    if (shoppingOfUser != null){
-        return res.status(200).send({
-            id: shoppingOfUser.id,
-            name: shoppingOfUser.name,
-            dueDateTime: shoppingOfUser.dueDateTime,
-            description: shoppingOfUser.description,
-            UserId: shoppingOfUser.UserId
-        })
-    }
-    return res.status(403).send({ message: 'You don\'t have permission for this shopping' })
+    return res.status(404).send({ message: 'No shopping with this id was found for the logged in user' })
 }
 
 const createShopping = async (req, res) => {
     const { name, dueDateTime, description } = req.body
 
     const loggedInUserId = req.user.id
-    let dueDateTimeConverted = null
-    if (dueDateTime){
-        dueDateTimeConverted = Date.parse(dueDateTime)
-    }
 
-    if (name == null){
+    if (!name){
         return res.status(400).send({ message: 'Shopping must have a name' })
     }
 
-    const newShopping = await shoppings.create({
-        name: name,
-        dueDateTime: dueDateTimeConverted,
-        description: description,
-        UserId: loggedInUserId
-    })
+    let dateTimeConverted = null
+    if (dueDateTime){
+        dateTimeConverted = new Date(dueDateTime)
+    }
+
+    const newShoppingId = await shoppingsRepository.createShopping(name, dateTimeConverted, description, loggedInUserId)
+    
+    if (newShoppingId == null){
+        return res.status(500).send({ message: 'Could not create new shopping' })
+    }
+    
+    await shoppingsRepository.addUserToShopping(loggedInUserId, newShoppingId)
+    const newShopping = await shoppingsRepository.getShoppingById(newShoppingId, loggedInUserId)
 
     if (newShopping == null){
         return res.status(500).send({ message: 'Could not create new shopping' })
     }
 
-    const newUserShoppingConnection = await userShoppings.create({
-        userId: loggedInUserId,
-        shoppingId: newShopping.id
-    })
-
-    if (newUserShoppingConnection == null){
-        await newShopping.destroy()
-        return res.status(500).send({ message: 'Could not create new shopping' })
-    }
-
-    res.status(201).send({
-        id: newShopping.id,
-        name: newShopping.name,
-        dueDateTime: newShopping.dueDateTime,
-        description: newShopping.description,
-        UserId: newShopping.UserId
-    })
+    res.status(201).send(newShopping)
 }
 
 
 module.exports = {
-    getShoppingsOfUser,
+    getShoppings,
     getShoppingById,
     createShopping
 }

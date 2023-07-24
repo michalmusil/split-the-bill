@@ -19,6 +19,9 @@ const getUsers = async (searchString, shoppingId, excludedUserId) => {
         values.push(excludedUserId)
     }
 
+    whereClause += ` AND Users.isDeleted = ?`
+    values.push(false)
+
 
     
     const [foundUsers] = await database.query(`
@@ -39,7 +42,12 @@ const getUserById = async (id) => {
     if (!Number(id) && id !== 0){
         return null
     }
-    const [foundUser] = await database.query(`SELECT * FROM Users WHERE id = ?`,[id])
+    const [foundUser] = await database.query(`
+    SELECT *
+    FROM Users 
+    WHERE id = ? AND isDeleted = ?
+    `,
+    [id, false])
     return foundUser[0]
 }
 
@@ -49,7 +57,12 @@ const getUserByEmail = async (email) => {
     if(!email){
         return null
     }
-    const [foundUser] = await database.query(`SELECT * FROM Users WHERE email = ?`,[email])
+    const [foundUser] = await database.query(`
+    SELECT *
+    FROM Users 
+    WHERE email = ? AND isDeleted = ?
+    `
+    ,[email, false])
     return foundUser[0]
 }
 
@@ -113,7 +126,7 @@ const deleteUser = async (id) => {
     if (!Number(id) && id !== 0){
         return false
     }
-    const [result] = await database.query(`DELETE FROM Users WHERE id = ?`,[id])
+    const [result] = await database.query(`UPDATE Users SET isDeleted = true WHERE id = ?`,[id])
     return result.affectedRows > 0
 }
 
