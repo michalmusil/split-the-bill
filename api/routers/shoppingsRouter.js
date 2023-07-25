@@ -6,6 +6,10 @@ const router = express.Router()
 router.get('/', controller.getShoppings)
 router.get('/:id', controller.getShoppingById)
 router.post('/', controller.createShopping)
-//router.delete('/:id', controller.deleteProduct)
+router.put('/', controller.updateShopping)
+router.delete('/:id', controller.deleteShopping)
+router.post('/:id/assignUser', controller.assignUserToShopping)
+router.post('/:id/addOrUpdateProduct', controller.addOrUpdateProduct)
+router.delete('/:id/removeProduct', controller.removeProduct)
 
 module.exports = router

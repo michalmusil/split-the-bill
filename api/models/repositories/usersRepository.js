@@ -28,7 +28,7 @@ const getUsers = async (searchString, shoppingId, excludedUserId) => {
         SELECT Users.id, Users.username, Users.email
         FROM Users 
         LEFT JOIN Users_shoppings ON Users.id = Users_shoppings.userId
-        LEFT JOIN Shoppings ON Users_shoppings.shoppingId = Shoppings.id
+        LEFT JOIN Shoppings ON Users_shoppings.shoppingId = Shoppings.id OR Users.id = Shoppings.creatorId
         ${whereClause}
         GROUP BY Users.id
     `, values)

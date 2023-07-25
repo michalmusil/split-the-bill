@@ -53,6 +53,8 @@ const addProduct = async (req, res) => {
     })
 }
 
+
+/*
 const deleteProduct = async (req, res) => {
     const productId = Number(req.params.id)
     
@@ -70,10 +72,10 @@ const deleteProduct = async (req, res) => {
 
     return res.status(200).send()
 }
+*/
 
 module.exports = {
     getProducts,
     getProductById,
-    addProduct,
-    deleteProduct
+    addProduct
 }

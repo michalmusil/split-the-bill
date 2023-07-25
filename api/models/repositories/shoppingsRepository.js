@@ -73,8 +73,8 @@ const addUserToShopping = async (userId, shoppingId) => {
     const now = new Date()
     try{
         const [result] = await database.query(
-            `INSERT INTO Users_shoppings(userId, shoppingId, updatedAt) VALUES(?, ?, ?)`,
-            [userId, shoppingId, now]
+            `INSERT INTO Users_shoppings(userId, shoppingId, createdAt, updatedAt) VALUES(?, ?, ?, ?)`,
+            [userId, shoppingId, now, now]
         )
         return result.insertId
     }catch(error){
@@ -123,11 +123,105 @@ const updateShopping = async (shoppingId, name, dueDateTime, description) => {
     return result.affectedRows > 0
 }
 
+
+
 const deleteShopping = async (id) => {
     if (!Number(id) && id !== 0){
         return false
     }
     const [result] = await database.query(`DELETE FROM Shoppings WHERE id = ?`,[id])
+    return result.affectedRows > 0
+}
+
+
+const getProductToShopping = async(shoppingId, productId) => {
+    if (!Number.isInteger(shoppingId) || !Number.isInteger(productId)){
+        return null
+    }
+
+    const [found] = await database.query(`
+    SELECT shoppingId, productId, quantity, unitPrice
+    FROM Shoppings_products
+    WHERE shoppingId = ? AND productId = ?
+    `
+    ,[shoppingId, productId])
+
+    return found[0]
+}
+
+
+
+const addProductToShopping = async (shoppingId, productId, quantity, unitPrice) => {
+    if (!Number.isInteger(shoppingId) || !Number.isInteger(productId) || 
+        !Number.isInteger(quantity) || (!Number(unitPrice) && unitPrice !== 0)){
+        return null
+    }
+
+    const now = new Date()
+    try{
+        const [result] = await database.query(`
+        INSERT INTO 
+        Shoppings_products(shoppingId, productId, quantity, unitPrice, createdAt, updatedAt) 
+        VALUES(?, ?, ?, ?, ?, ?)
+        `,
+            [shoppingId, productId, quantity, unitPrice, now, now]
+        )
+        return result.insertId
+    }catch(error){
+        return null
+    }
+}
+
+const updateProductToShopping = async (shoppingId, productId, quantity, unitPrice) => {
+    if (!Number.isInteger(shoppingId) || !Number.isInteger(productId)){
+        return false
+    }
+
+    let setStatements = []
+    let setValues = []
+
+    if(Number.isInteger(quantity)){
+        setStatements.push('quantity = ?')
+        setValues.push(quantity)
+    }
+
+    if(Number(unitPrice) || unitPrice === 0){
+        setStatements.push('unitPrice = ?')
+        setValues.push(unitPrice)
+    }
+
+    if(setStatements.length <= 0){
+        return false
+    }
+
+    const now = new Date()
+    setStatements.push("updatedAt = ?")
+    setValues.push(now)
+
+    const finalSetStatement = setStatements.join(',')
+
+    const [result] = await database.query(`
+    UPDATE Shoppings_products 
+    SET ${finalSetStatement}
+    WHERE shoppingId = ? AND productId = ?
+    `,
+    [...setValues, shoppingId, productId]
+    )
+    return result.affectedRows > 0
+}
+
+
+const deleteProductToShopping = async (shoppingId, productId) => {
+    if (!Number.isInteger(shoppingId) || !Number.isInteger(productId)){
+        return false
+    }
+
+    const [result] = await database.query(`
+    DELETE FROM Shoppings_products 
+    WHERE shoppingId = ? AND productId = ?
+    `,
+    [shoppingId, productId]
+    )
     return result.affectedRows > 0
 }
 
@@ -138,5 +232,9 @@ module.exports = {
     createShopping,
     addUserToShopping,
     updateShopping,
-    deleteShopping
+    deleteShopping,
+    getProductToShopping,
+    addProductToShopping,
+    updateProductToShopping,
+    deleteProductToShopping
 }
