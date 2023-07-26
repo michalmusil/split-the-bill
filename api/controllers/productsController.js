@@ -1,7 +1,18 @@
 const productsRepository = require('../models/repositories/productsRepository')
+const shopingsRepository = require('../models/repositories/shoppingsRepository')
 
 const getProducts = async (req, res) => {
     const { shoppingId, name, creatorId } = req.query
+
+    const loggedInUserId = req.user.id
+
+    if (Number(shoppingId) || shoppingId === 0){
+        // Gets the shopping only if the user is the owner, or is assigned to the shopping
+        const shoppingAssignedToUser = await shopingsRepository.getShoppingOfUserById(shoppingId, loggedInUserId)
+        if(shoppingAssignedToUser == null){
+            return res.status(403).send({ message: 'You are not authorized for the specified shopping' })
+        }
+    }
 
     const found = await productsRepository.getProducts(name,shoppingId, creatorId)
 

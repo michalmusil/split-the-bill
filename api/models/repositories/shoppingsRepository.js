@@ -2,7 +2,7 @@ const database = require('../database')
 
 const whereClauseBase = "WHERE 1=1" // The where clause base needs to be valid in case no other clauses are added, thus begins with 1=1
 
-const getShoppings = async (userId, searchQuery) => {
+const getShoppingsOfUser = async (userId, searchQuery) => {
     let whereClause = whereClauseBase
     const values = []
 
@@ -32,8 +32,8 @@ const getShoppings = async (userId, searchQuery) => {
 }
 
 
-
-const getShoppingById = async (id, userId) => {
+// This function also authorizes the user, because it only returns shopping if user is the owner or is assigned to it
+const getShoppingOfUserById = async (id, userId) => {
     if ((!Number(id) && id !== 0) || (!Number(userId) && userId !== 0)){
         return null
     }
@@ -79,6 +79,23 @@ const addUserToShopping = async (userId, shoppingId) => {
         return result.insertId
     }catch(error){
         return null
+    }
+}
+
+
+
+const removeUserFromShopping = async (userId, shoppingId) => {
+    if ((!Number(userId) && userId !== 0) || (!Number(shoppingId) && shoppingId !== 0)){
+        return false
+    }
+    try{
+        const [result] = await database.query(
+            `DELETE FROM Users_shoppings WHERE userId = ? AND shoppingId = ?`,
+            [userId, shoppingId]
+        )
+        return result.affectedRows > 0
+    }catch(error){
+        return false
     }
 }
 
@@ -134,8 +151,32 @@ const deleteShopping = async (id) => {
 }
 
 
+
+
+
+
+
+
+
+
+const getProductAssignmentsOfShopping = async (shoppingId) => {
+    if (!Number.isInteger(Number(shoppingId))){
+        return null
+    }
+    const [foundProductAssignments] = await database.query(`
+    SELECT Products.id, Products.name, Products.description, Shoppings_products.quantity, Shoppings_products.unitPrice
+    FROM Products
+    INNER JOIN Shoppings_products ON Products.id = Shoppings_products.productId
+    WHERE Shoppings_products.shoppingId = ?
+    GROUP BY Products.id
+    `
+    ,[shoppingId])
+    return foundProductAssignments
+}
+
+
 const getProductToShopping = async(shoppingId, productId) => {
-    if (!Number.isInteger(shoppingId) || !Number.isInteger(productId)){
+    if ((!Number(shoppingId) && shoppingId !== 0) || (!Number(productId) && productId !== 0)){
         return null
     }
 
@@ -152,8 +193,8 @@ const getProductToShopping = async(shoppingId, productId) => {
 
 
 const addProductToShopping = async (shoppingId, productId, quantity, unitPrice) => {
-    if (!Number.isInteger(shoppingId) || !Number.isInteger(productId) || 
-        !Number.isInteger(quantity) || (!Number(unitPrice) && unitPrice !== 0)){
+    if ((!Number(shoppingId) && shoppingId !== 0) || (!Number(productId) && productId !== 0) ||
+        !Number.isInteger(Number(quantity)) || (!Number(unitPrice) && unitPrice !== 0)){
         return null
     }
 
@@ -173,14 +214,14 @@ const addProductToShopping = async (shoppingId, productId, quantity, unitPrice) 
 }
 
 const updateProductToShopping = async (shoppingId, productId, quantity, unitPrice) => {
-    if (!Number.isInteger(shoppingId) || !Number.isInteger(productId)){
+    if ((!Number(shoppingId) && shoppingId !== 0) || (!Number(productId) && productId !== 0)){
         return false
     }
 
     let setStatements = []
     let setValues = []
 
-    if(Number.isInteger(quantity)){
+    if(Number.isInteger(Number(quantity))){
         setStatements.push('quantity = ?')
         setValues.push(quantity)
     }
@@ -212,7 +253,7 @@ const updateProductToShopping = async (shoppingId, productId, quantity, unitPric
 
 
 const deleteProductToShopping = async (shoppingId, productId) => {
-    if (!Number.isInteger(shoppingId) || !Number.isInteger(productId)){
+    if ((!Number(shoppingId) && shoppingId !== 0) || (!Number(productId) && productId !== 0)){
         return false
     }
 
@@ -227,12 +268,14 @@ const deleteProductToShopping = async (shoppingId, productId) => {
 
 
 module.exports = {
-    getShoppings,
-    getShoppingById,
+    getShoppingsOfUser,
+    getShoppingOfUserById,
     createShopping,
     addUserToShopping,
+    removeUserFromShopping,
     updateShopping,
     deleteShopping,
+    getProductAssignmentsOfShopping,
     getProductToShopping,
     addProductToShopping,
     updateProductToShopping,
