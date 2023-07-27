@@ -1,5 +1,6 @@
 const express = require('express')
 const dotenv = require('dotenv')
+const cors = require('cors')
 
 const jwtAuthentication = require('./middleware/jwtAuthentication')
 const authRouter = require('./routers/authRouter')
@@ -14,6 +15,7 @@ dotenv.config()
 app.use(express.json())
 app.use(express.static('./public'))
 app.use(express.urlencoded({ extended: true }))
+app.use(cors())
 
 
 
