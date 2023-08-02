@@ -29,6 +29,7 @@ const getShoppingsOfUser = async (userId, searchQuery) => {
         LEFT JOIN Shoppings_products ON Shoppings.id = Shoppings_products.shoppingId
         ${whereClause}
         GROUP BY Shoppings.id
+        ORDER BY Shoppings.dueDateTime DESC
     `, values)
 
     return foundShoppings

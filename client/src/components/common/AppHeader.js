@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+
 
 const AppHeader = ({sessionService}) => {
     const navigate = useNavigate()
@@ -17,12 +21,12 @@ const AppHeader = ({sessionService}) => {
 
     return (
         <header className = 'header'>
-            <div className = 'header-logo'>
+            <div className = 'headerLogo'>
                 <img src = '../../../logo.png' alt='Logo'></img>
                 <h1>Split the bill</h1>
             </div>
 
-            <div className = 'header-navigation'>
+            <div className = 'headerNavigation'>
                 <ul>
                     <li><Link to = '/'>
                             <div className='headerNavigationLink'>Home</div>
@@ -43,8 +47,12 @@ const AppHeader = ({sessionService}) => {
                 </ul>
             </div>
 
-            <div className = 'header-user' onClick = {(e) => logout(e)}>
+            <div className = 'headerUser'>
                 <p>{user?.email}</p>
+                <FontAwesomeIcon icon={faRightFromBracket} 
+                    className="logoutIcon" onClick={(e) => {
+                    logout(e)
+                }}/>
             </div>
         </header>
     )

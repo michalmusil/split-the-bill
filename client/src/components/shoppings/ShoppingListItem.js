@@ -1,5 +1,15 @@
+import { useEffect, useState } from "react"
 
 const ShoppingListItem = ({ shopping, onClick }) => {
+    const [dateTimeFormatted, setDateTimeFormatted] = useState(null)
+
+    useEffect(() => {
+        if (shopping.dueDateTime){
+            const date = new Date(shopping.dueDateTime)
+            setDateTimeFormatted(date.toLocaleDateString())
+        }
+    }, [shopping])
+
     return (
         <div className="shoppingListItem" onClick = {(e) => { onClick(e) }}>
             <div>
@@ -9,6 +19,14 @@ const ShoppingListItem = ({ shopping, onClick }) => {
             <div>
                 <table>
                     <tbody>
+                        {dateTimeFormatted ?
+                            <tr>
+                            <td>Deadline:</td>    
+                            <td>{dateTimeFormatted || ""}</td>    
+                            </tr>
+                        :
+                            ""
+                        }
                         <tr>
                             <td>Participants:</td>    
                             <td>{shopping.numberOfParticipants || 0}</td>    
