@@ -1,5 +1,4 @@
 import { createContext, useState, useEffect } from "react";
-import container from '../../utils/AppContainer'
 import JwtDecoder from 'jwt-decode'
 
 export const UserContext = createContext(null)
@@ -20,7 +19,6 @@ const Context = ({children}) => {
             const user = JwtDecoder(jwtToken)
             if(user){
                 setUser(user)
-                console.log(user)
             }
         }
 

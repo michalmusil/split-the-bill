@@ -1,13 +1,10 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { JwtTokenContext } from '../components/common/UserContext';
 import axios from 'axios'
 import container from '../utils/AppContainer'
 
-const LoginPage = () => {
-    const navigate = useNavigate()
-    const {jwtToken, setJwtToken} = useContext(JwtTokenContext)
-    
+const LoginPage = ({ SessionService }) => {   
+    const navigate = useNavigate() 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
@@ -20,13 +17,12 @@ const LoginPage = () => {
             //login(res.data.token)
             login(res.data)
         }).catch((err) => {
-            console.log(err)
         })
     }
 
     const login = async (responseData) => {
         const token = responseData.token
-        setJwtToken(token)
+        await SessionService.logUserInByToken(token)
         navigate('/')
     }
 

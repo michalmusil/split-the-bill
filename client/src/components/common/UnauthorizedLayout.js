@@ -1,18 +1,6 @@
-import { useContext, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-import { UserContext } from "./UserContext";
+import { Outlet } from "react-router-dom";
 
 const UnauthorizedLayout = () => {
-    const navigate = useNavigate()
-    const user = useContext(UserContext)
-
-    useEffect(() => {
-        if (user){
-            navigate('/')
-        }
-    }, [user])
-
-    
     return (
         <>
             <Outlet />

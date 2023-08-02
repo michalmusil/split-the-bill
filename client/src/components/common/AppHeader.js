@@ -1,16 +1,19 @@
-import { useLocation, Link } from 'react-router-dom'
-import { JwtTokenContext } from './UserContext'
-import { useContext } from 'react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
-const AppHeader = ({loggedInUser}) => {
-    const { setJwtToken } = useContext(JwtTokenContext)
-
-    console.log('logged in user')
-    console.log(loggedInUser)
-
+const AppHeader = ({SessionService}) => {
+    const navigate = useNavigate()
     const logout = async (e) => {
-        setJwtToken(null)
+        await SessionService.logOut()
+        navigate('/auth/login')
     }
+
+    const [user, setUser] = useState(null)
+    useEffect(() => {
+        setUser(SessionService.getUser())
+    })
+
 
     return (
         <header className = 'header'>
@@ -29,7 +32,7 @@ const AppHeader = ({loggedInUser}) => {
             </div>
 
             <div className = 'header-user' onClick = {(e) => logout(e)}>
-                <p>{loggedInUser?.username}</p>
+                <p>{user?.email}</p>
             </div>
         </header>
     )
