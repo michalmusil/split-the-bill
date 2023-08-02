@@ -14,14 +14,17 @@ class SessionService{
     }
 
     getUser(){
-        if (this.user !== null){
+        if (this.user != null){
             return this.user
         }
         return null
     }
 
     getUserToken(){
-        return this.user.token || null
+        if (this.user != null){
+            return `Bearer ${this.user.token}`
+        }
+        return null
     }
 
     async logUserInByToken(token){

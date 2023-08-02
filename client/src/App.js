@@ -8,6 +8,7 @@ import UnauthorizedLayout from './components/common/UnauthorizedLayout'
 import LoginPage from './pages/Login'
 import HomePage from './pages/Home'
 import ShoppingsPage from './pages/Shoppings'
+import ShoppingDetail from './pages/ShoppingDetail'
 
 
 
@@ -29,12 +30,13 @@ function App() {
                 
           <Routes>
             <Route path = '/auth' element={ <UnauthorizedLayout /> }>
-              <Route path = 'login' element = { <LoginPage SessionService = {sessionService}/> }/>
+              <Route path = 'login' element = { <LoginPage sessionService = {sessionService}/> }/>
             </Route>
             
-            <Route path = '/' element = { <AuthorizedLayout SessionService = {sessionService}/> }>
-              <Route index Component={HomePage} />
-              <Route path = 'shoppings' Component = {ShoppingsPage}/>
+            <Route path = '/' element = { <AuthorizedLayout sessionService = {sessionService}/> }>
+              <Route index element={ <HomePage /> } />
+              <Route path = 'shoppings' element = { <ShoppingsPage sessionService = {sessionService}/> } />
+              <Route path = 'shoppings/:id' element = { <ShoppingDetail sessionService = {sessionService}/> } />
             </Route>
           </Routes>
 

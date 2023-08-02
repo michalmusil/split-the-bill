@@ -20,10 +20,13 @@ const getShoppingsOfUser = async (userId, searchQuery) => {
 
     
     const [foundShoppings] = await database.query(`
-        SELECT Shoppings.id, Shoppings.name, Shoppings.dueDateTime, Shoppings.description, Shoppings.creatorId
+        SELECT Shoppings.id, Shoppings.name, Shoppings.dueDateTime, Shoppings.description, Shoppings.creatorId, 
+            SUM(Shoppings_products.quantity) AS numberOfItems, SUM(Shoppings_products.quantity * Shoppings_products.unitPrice) AS totalCost,
+            (COUNT(Users.id)+1) AS numberOfParticipants
         FROM Shoppings 
         LEFT JOIN Users_shoppings ON Shoppings.id = Users_shoppings.shoppingId
         LEFT JOIN Users ON Users_shoppings.userId = Users.id
+        LEFT JOIN Shoppings_products ON Shoppings.id = Shoppings_products.shoppingId
         ${whereClause}
         GROUP BY Shoppings.id
     `, values)
@@ -38,11 +41,15 @@ const getShoppingOfUserById = async (id, userId) => {
         return null
     }
     const [foundShopping] = await database.query(`
-    SELECT Shoppings.id, Shoppings.name, Shoppings.dueDateTime, Shoppings.description, Shoppings.creatorId
+    SELECT Shoppings.id, Shoppings.name, Shoppings.dueDateTime, Shoppings.description, Shoppings.creatorId,
+        SUM(Shoppings_products.quantity) AS numberOfItems, SUM(Shoppings_products.quantity * Shoppings_products.unitPrice) AS totalCost,
+        (COUNT(Users.id)+1) AS numberOfParticipants
     FROM Shoppings
     LEFT JOIN Users_shoppings ON Shoppings.id = Users_shoppings.shoppingId
     LEFT JOIN Users ON Users_shoppings.userId = Users.id
+    LEFT JOIN Shoppings_products ON Shoppings.id = Shoppings_products.shoppingId
     WHERE Shoppings.id = ? AND (Shoppings.creatorId = ? OR (Users.id = ? AND Users.isDeleted = ?))
+    GROUP BY Shoppings.id
     `
     ,[id, userId, userId, false])
     return foundShopping[0]

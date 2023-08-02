@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios'
 import container from '../utils/AppContainer'
 
-const LoginPage = ({ SessionService }) => {   
+const LoginPage = ({ sessionService }) => {   
     const navigate = useNavigate() 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -22,7 +22,7 @@ const LoginPage = ({ SessionService }) => {
 
     const login = async (responseData) => {
         const token = responseData.token
-        await SessionService.logUserInByToken(token)
+        await sessionService.logUserInByToken(token)
         navigate('/')
     }
 

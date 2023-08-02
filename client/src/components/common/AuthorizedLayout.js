@@ -2,19 +2,19 @@ import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import AppHeader from "./AppHeader";
 
-const AuthorizedLayout = ({ children, SessionService}) => {
+const AuthorizedLayout = ({ children, sessionService}) => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        const loggedIn = SessionService.isAuthorized()
+        const loggedIn = sessionService.isAuthorized()
         if (!loggedIn){
             navigate('/auth/login')
         }
-    })
+    }, [])
 
     return (
         <>
-            <AppHeader SessionService={SessionService}/>
+            <AppHeader sessionService={sessionService}/>
             <Outlet />
         </>
     )
