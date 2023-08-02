@@ -1,6 +1,17 @@
 import { useLocation, Link } from 'react-router-dom'
+import { JwtTokenContext } from './UserContext'
+import { useContext } from 'react'
 
 const AppHeader = ({loggedInUser}) => {
+    const { setJwtToken } = useContext(JwtTokenContext)
+
+    console.log('logged in user')
+    console.log(loggedInUser)
+
+    const logout = async (e) => {
+        setJwtToken(null)
+    }
+
     return (
         <header className = 'header'>
             <div className = 'header-logo'>
@@ -17,8 +28,8 @@ const AppHeader = ({loggedInUser}) => {
                 </ul>
             </div>
 
-            <div className = 'header-user'>
-                <p>{loggedInUser.username}</p>
+            <div className = 'header-user' onClick = {(e) => logout(e)}>
+                <p>{loggedInUser?.username}</p>
             </div>
         </header>
     )

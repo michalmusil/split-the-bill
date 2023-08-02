@@ -1,0 +1,9 @@
+:root {
+    /* Define your color variables here */
+    --primary: #242582;
+    --onPrimary: #EDE4E4;
+    --secondary: #F64C72;
+    --onSecondary: #EDE4E4;
+    --background: #F0DDDD;
+    --onBackground: #2E2E2E;
+}
