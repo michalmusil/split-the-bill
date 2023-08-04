@@ -202,8 +202,11 @@ const getProductToShopping = async(shoppingId, productId) => {
 
 const addProductToShopping = async (shoppingId, productId, quantity, unitPrice) => {
     if ((!Number(shoppingId) && shoppingId !== 0) || (!Number(productId) && productId !== 0) ||
-        !Number.isInteger(Number(quantity)) || (!Number(unitPrice) && unitPrice !== 0)){
+        !Number.isInteger(Number(quantity))){
         return null
+    }
+    if(!Number(unitPrice) && unitPrice !== 0){
+        unitPrice = null
     }
 
     const now = new Date()
@@ -234,7 +237,8 @@ const updateProductToShopping = async (shoppingId, productId, quantity, unitPric
         setValues.push(quantity)
     }
 
-    if(Number(unitPrice) || unitPrice === 0){
+    // Unit price can't be undefined
+    if(Number(unitPrice) || unitPrice === 0 || unitPrice === null){
         setStatements.push('unitPrice = ?')
         setValues.push(unitPrice)
     }

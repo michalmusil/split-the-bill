@@ -55,7 +55,7 @@ CREATE TABLE `Shoppings_products` (
   `shoppingId` int NOT NULL,
   `productId` int NOT NULL,
   `quantity` int NOT NULL,
-  `unitPrice` double NOT NULL,
+  `unitPrice` double,
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL,
   PRIMARY KEY (`shoppingId`,`productId`),

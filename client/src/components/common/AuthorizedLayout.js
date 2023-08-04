@@ -7,8 +7,9 @@ const AuthorizedLayout = ({ children, sessionService}) => {
 
     useEffect(() => {
         const loggedIn = sessionService.isAuthorized()
+        //console.log(`Logged in: ${loggedIn}`)
         if (!loggedIn){
-            navigate('/auth/login')
+            navigate('/auth/login', { replace: true })
         }
     }, [])
 

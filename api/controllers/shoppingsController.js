@@ -251,10 +251,6 @@ const addOrUpdateProduct = async(req, res) => {
         return res.status(400).send({ message: 'Quantity must be specified and must be an integer' })
     }
 
-    if (!Number(unitPrice) && unitPrice !== 0){
-        return res.status(400).send({ message: 'Unit price must be specified' })
-    }
-
     const product = await productsRepository.getProductByName(productName)
 
 

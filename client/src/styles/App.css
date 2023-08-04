@@ -44,6 +44,14 @@ button:hover {
   box-shadow: 0px 0px 10px var(--secondary);
 }
 
+
+table {
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+
+
 form label {
   display: block;
   margin: 15px 0 5px 0;
