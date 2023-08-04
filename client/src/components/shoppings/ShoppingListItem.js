@@ -1,3 +1,4 @@
+import cs from "./ShoppingListItem.module.css"
 import { useEffect, useState } from "react"
 
 const ShoppingListItem = ({ shopping, onClick }) => {
@@ -11,7 +12,7 @@ const ShoppingListItem = ({ shopping, onClick }) => {
     }, [shopping])
 
     return (
-        <div className="shoppingListItem" onClick = {(e) => { onClick(e) }}>
+        <div className={cs.shoppingListItem} onClick = {(e) => { onClick(e) }}>
             <div>
                 <h2>{shopping.name}</h2>
                 <p>{shopping.description || "No description"}</p>
@@ -35,7 +36,6 @@ const ShoppingListItem = ({ shopping, onClick }) => {
                             <td>Shopping items:</td>
                             <td>{shopping.numberOfItems || 0}</td>
                         </tr>
-                        <hr/>
                         <tr>
                             <td>Total:</td>    
                             <td>{shopping.totalCost || 0},-</td>    

@@ -1,3 +1,4 @@
+import cs from "./AppHeader.module.css"
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
@@ -20,37 +21,37 @@ const AppHeader = ({sessionService}) => {
 
 
     return (
-        <header className = 'header'>
-            <div className = 'headerLogo'>
+        <header className = {cs.header}>
+            <div className = {cs.headerLogo}>
                 <img src = '../../../logo.png' alt='Logo'></img>
                 <h1>Split the bill</h1>
             </div>
 
-            <div className = 'headerNavigation'>
+            <div className = {cs.headerNavigation}>
                 <ul>
                     <li><Link to = '/'>
-                            <div className='headerNavigationLink'>Home</div>
+                            <div className={cs.headerNavigationLink}>Home</div>
                         </Link>
                     </li>
                     <li><Link to = '/shoppings'>
-                            <div className='headerNavigationLink'>Shoppings</div>
+                            <div className={cs.headerNavigationLink}>Shoppings</div>
                         </Link>
                     </li>
                     <li><Link to = '/products'>
-                            <div className='headerNavigationLink'>Products</div>
+                            <div className={cs.headerNavigationLink}>Products</div>
                         </Link>
                     </li>
                     <li><Link to = '/users'>
-                            <div className='headerNavigationLink'>Users</div>
+                            <div className={cs.headerNavigationLink}>Users</div>
                         </Link>
                     </li>
                 </ul>
             </div>
 
-            <div className = 'headerUser'>
+            <div className = {cs.headerUser}>
                 <p>{user?.email}</p>
                 <FontAwesomeIcon icon={faRightFromBracket} 
-                    className="logoutIcon" onClick={(e) => {
+                    className={cs.logoutIcon} onClick={(e) => {
                     logout(e)
                 }}/>
             </div>

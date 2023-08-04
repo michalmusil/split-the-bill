@@ -1,13 +1,14 @@
 :root {
     /* Define your color variables here */
-    --primary: #242582;
+    --primary: #6f2232;
     --onPrimary: #EDE4E4;
-    --secondary: #F64C72;
+    --secondary: #c3073f;
     --onSecondary: #EDE4E4;
-    --background: #eee6e6;
-    --onBackground: #2E2E2E;
-    --surface: #eee9e9;
-    --onSurface: #2E2E2E;
-    --shadow: #343434;
+    --background: #1a1a1d;
+    --onBackground: #EDE4E4;
+    --surface: #232329;
+    --onSurface: #e2d8d8;
+    --shadow: #565656;
     --error: #cf1212;
+    --transparent: #ffffff00;
 }

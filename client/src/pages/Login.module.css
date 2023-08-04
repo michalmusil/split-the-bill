@@ -1,0 +1,70 @@
+@import '../styles/Colors.css';
+
+
+
+.loginPageContent {
+    margin: 0;
+    height: 100vh;
+    position: relative
+  }
+  
+  .loginContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--primary);
+    color: var(--onPrimary);
+    border-radius: 20px;
+    padding: 50px;
+  }
+  
+  .loginContainer img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .loginContainer form {
+    margin-top: 30px;
+  }
+  
+  .loginContainer form div {
+    margin: 10px 0;
+  }
+  
+  .loginContainer form input {
+    outline: none;
+    border: solid 1px var(--secondary);
+    border-radius: 15px;
+    padding: 5px;
+  
+    box-shadow: 0px 0px 0px var(--secondary);
+    transition: box-shadow 0.2s ease-in-out;
+  }
+  
+  .loginContainer form input:focus {
+    box-shadow: 0px 0px 10px var(--secondary);
+  }
+  
+  .loginContainer form button {
+    outline: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 15px;
+    padding: 5px 50px;
+    width: 100%;
+    background-color: var(--secondary);
+    color: var(--onSecondary);
+    opacity: 60%;
+    transition: opacity 0.2s ease;
+  }
+  
+  .loginContainer form button:hover {
+    opacity: 100%;
+  }
+  
+  .loginContainer form .formError * {
+    color: var(--error);
+    font-weight: bold;
+    font-size: 0.8em;
+  }
