@@ -17,7 +17,6 @@ const ShoppingItemsList = ({ sessionService, shopping, shoppingItems, onItemAdde
 
     useEffect(() => {
         const valid = newItemName && newItemQuantity
-        console.log(valid)
         setNewItemValid(valid)
     }, [newItemName, newItemQuantity, newItemUnitPrice])
 

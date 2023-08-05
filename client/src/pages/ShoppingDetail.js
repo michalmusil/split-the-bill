@@ -1,20 +1,24 @@
 import cs from "./ShoppingDetail.module.css"
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import axios from "axios"
 import container from '../utils/AppContainer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faTrash,faPlus, faCheck } from '@fortawesome/free-solid-svg-icons'
 import ShoppingItemsList from '../components/shoppings/ShoppingItemsList'
+import ConfirmationModal from '../components/modals/ConfirmationModal'
 
 const ShoppingDetail = ({ sessionService }) => {
+    const navigate = useNavigate()
     const { id } = useParams()
 
     const [shopping, setShopping] = useState(null)
     const [shoppingCreator, setShoppingCreator] = useState(null)
     const [shoppingItems, setShoppingItems] = useState([])
     const [participants, setParticipants] = useState([])
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
 
     
 
@@ -73,10 +77,34 @@ const ShoppingDetail = ({ sessionService }) => {
         })
     }
 
+    const deleteShopping = () => {
+        console.log("Deleted")
+        axios.delete(container.routing.deleteShopping(id), {
+            headers: { Authorization: sessionService.getUserToken() }
+        }).then((res) => {
+            navigate(-1)
+        }).catch((err) => {
+            // TODO
+        })
+    }
+
 
 
     return (
         <section className="shoppingDetailPageContent">
+            {showDeleteModal && (
+                <ConfirmationModal 
+                title={"Delete shopping"} 
+                body={"Are you sure you want to delete this shopping? This action is irreversible."}
+                onDismiss={() => { 
+                    setShowDeleteModal(false)
+                 }}
+                onConfirm={() => {
+                    setShowDeleteModal(false)
+                    deleteShopping()
+                }} />
+            )}
+
             <div className="pageHeader">
                 <div className={cs.titleAndAuthorContainer}>
                     <h1 className='pageTitle'>{shopping?.name}</h1>
@@ -86,7 +114,9 @@ const ShoppingDetail = ({ sessionService }) => {
                 </div>
                 
                 {shoppingCreator?.id === sessionService.getUser()?.id && ( 
-                    <button className={cs.deleteButton}onClick={(e) => { /* TODO */ }}>
+                    <button className={cs.deleteButton} onClick={(e) => {
+                        setShowDeleteModal(true)
+                    }}>
                         <FontAwesomeIcon icon={faTrash} />
                         Delete
                     </button>

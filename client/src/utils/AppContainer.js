@@ -5,6 +5,7 @@ const routing = {
     register: `${baseUrl}/auth/register`,
     getAllShoppings: (searchQuery) => { return `${baseUrl}/shoppings${searchQuery ? `?search=${searchQuery}` : ""}`},
     getShoppingById: (id) => { return `${baseUrl}/shoppings/${id}` },
+    deleteShopping: (id) => { return `${baseUrl}/shoppings/${id}` },
     postNewShopping: `${baseUrl}/shoppings`,
     getProductAssignmentsByShoppingId: (id) => { return `${baseUrl}/shoppings/${id}/productAssignments` },
     getUsersOfShoppingByShoppingId: (id) => { return `${baseUrl}/users?shoppingId=${id}` },
