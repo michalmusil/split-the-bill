@@ -10,6 +10,7 @@ const routing = {
     getProductAssignmentsByShoppingId: (id) => { return `${baseUrl}/shoppings/${id}/productAssignments` },
     getUsersOfShoppingByShoppingId: (id) => { return `${baseUrl}/users?shoppingId=${id}` },
     getUserById: (id) => { return `${baseUrl}/users/${id}` },
+    getUsers: (searchQuery) => { return `${baseUrl}/users${searchQuery ? `?searchString=${searchQuery}` : ""}`},
     getProductById: (id) => { return `${baseUrl}/products/${id}` },
     addOrUpdateProductAssignment: (shoppingId) => { return `${baseUrl}/shoppings/${shoppingId}/addOrUpdateProduct` },
 }

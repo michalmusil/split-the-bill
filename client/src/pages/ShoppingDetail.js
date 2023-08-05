@@ -5,9 +5,10 @@ import axios from "axios"
 import container from '../utils/AppContainer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { faTrash,faPlus, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import ShoppingItemsList from '../components/shoppings/ShoppingItemsList'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
+import AddUsersModal from '../components/modals/AddUsersModal'
 
 const ShoppingDetail = ({ sessionService }) => {
     const navigate = useNavigate()
@@ -19,6 +20,7 @@ const ShoppingDetail = ({ sessionService }) => {
     const [participants, setParticipants] = useState([])
 
     const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [showAddUsersModal, setShowAddUsersModal] = useState(false)
 
     
 
@@ -105,6 +107,16 @@ const ShoppingDetail = ({ sessionService }) => {
                 }} />
             )}
 
+            {showAddUsersModal && (
+                <AddUsersModal 
+                sessionService={sessionService}
+                alreadyAssignedUsers={participants}
+                onDismiss={() => { setShowAddUsersModal(false) }}
+                onConfirm={(newUsers) => {
+
+                }} />
+            )}
+
             <div className="pageHeader">
                 <div className={cs.titleAndAuthorContainer}>
                     <h1 className='pageTitle'>{shopping?.name}</h1>
@@ -123,6 +135,15 @@ const ShoppingDetail = ({ sessionService }) => {
                     )
                 }
                 
+            </div>
+
+            <div>
+                <h2>Participants</h2>
+                <button className="circularButton" onClick={(e) => {
+                    setShowAddUsersModal(true)
+                }}>
+                    <FontAwesomeIcon icon={faPlus} />
+                </button>
             </div>
 
             <div className={cs.shoppingDetailPageContent}>

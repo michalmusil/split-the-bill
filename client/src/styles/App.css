@@ -122,10 +122,12 @@ form textarea:focus {
   padding: 0;
 }
 
+
 .modal, .modalOverlay{
   position: absolute;
   width: 100vw;
   height: 100vh;
+  z-index: 100;
   top: 0;
   right: 0;
   bottom: 0;
@@ -136,15 +138,18 @@ form textarea:focus {
 
 .modal .modalContent {
   position: absolute;
-  padding: 50px;
+  padding: 30px 50px;
   background-color: var(--surface);
   border-radius: 15px;
   opacity: 100%;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 5;
+  z-index: 200;
 }
 
+.modalContent h1 {
+  margin-top: 0;
+}
 
 

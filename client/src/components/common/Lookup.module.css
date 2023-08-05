@@ -1,0 +1,48 @@
+@import '../../styles/Colors.css';
+
+.lookupContainer {
+    position: relative;
+    padding: 0;
+    margin: 30px 0;
+}
+
+.lookupInput {
+    outline: none;
+    border: solid 1px var(--secondary);
+    border-radius: 15px;
+    padding: 5px;
+    margin: 0 auto;
+  
+    box-shadow: 0px 0px 0px var(--secondary);
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.lookupInput:focus {
+    box-shadow: 0px 0px 10px var(--secondary);
+}
+
+.lookupResults {
+    position: absolute;
+    list-style: none;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px var(--shadow);
+    max-height: 200px;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.lookupItem {
+    cursor: pointer;
+    text-align: left;
+    padding: 5px;
+    background-color: var(--surface);
+    transition: background-color 0.2s ease;
+}
+
+.lookupItem:hover {
+    background-color: var(--secondary);
+}
