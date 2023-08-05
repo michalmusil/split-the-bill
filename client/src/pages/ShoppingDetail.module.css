@@ -10,33 +10,13 @@
     box-shadow: 0px 0px 10px var(--error);
 }
 
-.shoppingProductAssignmentsTable {
-    background-color: var(--surface);
-    width: 100%;
-    overflow: hidden;
-    border-radius: 15px;
-    box-shadow: 0px 0px 5px var(--primary);
+.titleAndAuthorContainer h1, .titleAndAuthorContainer span {
+    display: block;
+    padding: 0 auto;
+    margin: 5px auto;
+    text-align: left;
 }
 
-.shoppingProductAssignmentsTable thead tr:nth-child(1) {
-    border-bottom: 1px solid var(--primary);
-}
-
-.shoppingProductAssignmentsTable thead tr:nth-child(2) th{
-    padding: 15px;
-    font-size: 1.15em;
-    border-bottom: 1px solid var(--primary);
-}
-
-.shoppingProductAssignmentsTable tbody tr td{
-    padding: 20px 0;
-    border-bottom: 0.5px solid var(--shadow);
-}
-
-.shoppingProductAssignmentsTable tbody tr:last-child td{
-    border: none;
-}
-
-.newItemInputRow {
-    background-color: var(--primary);
+.titleAndAuthorContainer span {
+    margin-left: 20px;
 }

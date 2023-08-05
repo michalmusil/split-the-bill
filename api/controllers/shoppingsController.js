@@ -259,7 +259,7 @@ const addOrUpdateProduct = async(req, res) => {
     if(product == null){
         productId = await productsRepository.addProduct(productName, null, null, loggedInUserId)
         const newAssignmentId = await shoppingsRepository.addProductToShopping(shoppingId, productId, quantity, unitPrice)
-        return res.status(200).send({ message: 'New product created and added to shopping' })
+        return res.status(201).send({ productId: productId ,message: 'New product created and added to shopping' })
     }
 
     productId = product.id
@@ -269,11 +269,11 @@ const addOrUpdateProduct = async(req, res) => {
     // If yes, just update it
     if(productAssignment != null){
         const updated = await shoppingsRepository.updateProductToShopping(shoppingId, productId, quantity, unitPrice)
-        return res.status(200).send({ message: 'Product assignment to shopping updated' })
+        return res.status(204).send({ productId: productId ,message: 'Product assignment to shopping updated' })
     }
     // If not, create the assignment
     const newAssignmentId = await shoppingsRepository.addProductToShopping(shoppingId, productId, quantity, unitPrice)
-    return res.status(200).send({ message: 'Product was assigned to the shopping' })
+    return res.status(201).send({ productId: productId ,message: 'Product was assigned to the shopping' })
 }
 
 

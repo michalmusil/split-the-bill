@@ -42,6 +42,7 @@ class SessionService{
         }
         
         this.user = {
+            id: newUser.id,
             username: newUser.username,
             email: newUser.email,
             token: token

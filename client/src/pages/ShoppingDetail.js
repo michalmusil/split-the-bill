@@ -5,24 +5,22 @@ import axios from "axios"
 import container from '../utils/AppContainer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { faTrash,faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faTrash,faPlus, faCheck } from '@fortawesome/free-solid-svg-icons'
+import ShoppingItemsList from '../components/shoppings/ShoppingItemsList'
 
 const ShoppingDetail = ({ sessionService }) => {
     const { id } = useParams()
 
     const [shopping, setShopping] = useState(null)
-    const [productAssigments, setProductAssignments] = useState([])
+    const [shoppingCreator, setShoppingCreator] = useState(null)
+    const [shoppingItems, setShoppingItems] = useState([])
     const [participants, setParticipants] = useState([])
 
-    // Attributes of new shopping item to create
-    const [newItemName, setNewItemName] = useState(null)
-    const [newItemDescription, setNewItemDescription] = useState(null)
-    const [newItemQuantity, setNewItemQuantity] = useState(null)
-    const [newItemUnitPrice, setNewItemUnitPrice] = useState(null)
+    
 
     useEffect(() => {
         fetchShoppingDetail()
-        fetchProductAssignments()
+        fetchShoppingItems()
         fetchParticipants()
     }, [])
 
@@ -33,18 +31,31 @@ const ShoppingDetail = ({ sessionService }) => {
             }
         }).then((res) => {
             setShopping(res.data)
+            fetchShoppingCreator(res.data.creatorId)
         }).catch((err) => {
             // TODO
         })
     }
 
-    const fetchProductAssignments = () => {
+    const fetchShoppingCreator = (id) => {
+        axios.get(container.routing.getUserById(id), { 
+            headers: {
+                Authorization: sessionService.getUserToken()
+            }
+        }).then((res) => {
+            setShoppingCreator(res.data)
+        }).catch((err) => {
+            // TODO
+        })
+    }
+
+    const fetchShoppingItems = () => {
         axios.get(container.routing.getProductAssignmentsByShoppingId(id), { 
             headers: {
                 Authorization: sessionService.getUserToken()
             }
         }).then((res) => {
-            setProductAssignments(res.data)
+            setShoppingItems(res.data)
         }).catch((err) => {
             // TODO
         })
@@ -62,91 +73,36 @@ const ShoppingDetail = ({ sessionService }) => {
         })
     }
 
-    useEffect(() => {
-        console.log(`${newItemName} ;${newItemDescription} ;${newItemQuantity} ;${newItemUnitPrice} ;`)
-    }, [newItemName, newItemDescription, newItemQuantity, newItemUnitPrice])
-
-
 
 
     return (
         <section className="shoppingDetailPageContent">
             <div className="pageHeader">
-                 <h1 className='pageTitle'>{shopping?.name}</h1>
-
-                <button className={cs.deleteButton}onClick={(e) => { /* TODO */ }}>
-                    <FontAwesomeIcon icon={faTrash} />
-                    Delete
-                </button>
+                <div className={cs.titleAndAuthorContainer}>
+                    <h1 className='pageTitle'>{shopping?.name}</h1>
+                    {shoppingCreator && (
+                        <span>{`Created by: ${shoppingCreator.username} (${shoppingCreator.email})`}</span>
+                    )}
+                </div>
+                
+                {shoppingCreator?.id === sessionService.getUser()?.id && ( 
+                    <button className={cs.deleteButton}onClick={(e) => { /* TODO */ }}>
+                        <FontAwesomeIcon icon={faTrash} />
+                        Delete
+                    </button>
+                    )
+                }
+                
             </div>
 
             <div className={cs.shoppingDetailPageContent}>
-                <table className={cs.shoppingProductAssignmentsTable}>
-                    <thead>
-                        <tr className={cs.tableTitle}>
-                            <th colSpan={5}>
-                                <h1>List of products</h1>
-                            </th>
-                        </tr>
-                        <tr className={cs.tableTitle}>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Quantity</th>
-                            <th>Unit price</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {productAssigments.map((product, key) => {
-                            return (
-                                <tr key={key}>
-                                    <td>{product.name}</td>
-                                    <td>{product.description || "-"}</td>
-                                    <td>{product.quantity || "-"}</td>
-                                    <td>{product.unitPrice ? `${product.unitPrice},-` : "-"}</td>
-                                    <td>{product.unitPrice && product.quantity ?
-                                        `${product.unitPrice * product.quantity},-`
-                                        :
-                                        "-"
-                                    }</td>
-                                </tr>
-                            )
-                        })}
-                        <tr className={cs.newItemInputRow}>
-                            <td>
-                                <input type="text" placeholder="Name" onChange={(e) => { 
-                                    setNewItemName(e.target.value || null) 
-                                }}/>
-                             </td>
-                            <td></td>
-                            <td>
-                                <input type="number" placeholder="Quantity" onChange={(e) => { 
-                                    const integerValue = parseInt(e.target.value)
-                                    setNewItemQuantity(integerValue || null) 
-                                }}/></td>
-                            <td>
-                                <input type="number" placeholder="Unit price" onChange={(e) => { 
-                                    const asNumber = Number(e.target.value)
-                                    setNewItemUnitPrice(asNumber || null)
-                                }}/></td>
-                            <td>
-                                {newItemQuantity && newItemUnitPrice ? 
-                                    `${newItemQuantity * newItemUnitPrice},-`
-                                :
-                                    "-"
-                                }
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colSpan={5}>
-                                <button>
-                                    <FontAwesomeIcon icon={faPlus} />
-                                    Add
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <ShoppingItemsList sessionService={sessionService} shoppingItems={shoppingItems} shopping={shopping}
+                    onItemAdded={(item) => {
+                        setShoppingItems([...shoppingItems, item])
+                    }}
+                    onItemUpdated={(item => {
+                        // TODO
+                    })}/>
             </div>
         </section>
     )

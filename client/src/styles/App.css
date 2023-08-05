@@ -98,6 +98,12 @@ form textarea:focus {
   text-align: center;
 }
 
+.circularButton {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  padding: 10px;
+}
 
 .pageHeader {
   display: flex;
