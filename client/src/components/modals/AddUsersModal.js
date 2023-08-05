@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 
 import Lookup from "../common/Lookup"
+import HorizontalUsersList from "../users/HorizontalUsersList"
 
 const AddUserModal = ({ sessionService, onConfirm, onDismiss, alreadyAssignedUsers }) => {
     const [usersToAdd, setUsersToAdd] = useState([])
@@ -31,24 +32,37 @@ const AddUserModal = ({ sessionService, onConfirm, onDismiss, alreadyAssignedUse
         <div className="modal">
             <div className="modalOverlay" onClick={(e) => { onDismiss() }} />
             <div className="modalContent">
-                <h1>Add users</h1>
-                
-                <Lookup 
-                fetchData={fetchUserResults} 
-                getItemStringRepresentation={(user) => {
-                    return `${user.username} (${user.email})`
-                }}
-                onItemSelected={(user) => {
-                    setUsersToAdd([...usersToAdd, user])
-                }}
-                placeholder="Search user" />
+                <div className={cs.sizeJustifier}>
+                    <h1>Add users</h1>
+                    
+                    {usersToAdd?.length > 0 && (
+                        <HorizontalUsersList
+                        users={usersToAdd}
+                        onUserClicked={(user) => {
+                            const newUsers = [...usersToAdd]
+                            const indexToRemove = newUsers.indexOf(user)
+                            newUsers.splice(indexToRemove, 1)
+                            setUsersToAdd(newUsers)
+                        }} />
+                    )}
 
-                {usersToAdd?.length > 0 && (
-                    <button onClick={(e) => { onConfirm(usersToAdd) }}>
-                        <FontAwesomeIcon icon={faCheck} />
-                        Confirm
-                    </button>
-                )}
+                    <Lookup 
+                    fetchData={fetchUserResults} 
+                    getItemStringRepresentation={(user) => {
+                        return `${user.username} (${user.email})`
+                    }}
+                    onItemSelected={(user) => {
+                        setUsersToAdd([...usersToAdd, user])
+                    }}
+                    placeholder="Search user" />
+
+                    {usersToAdd?.length > 0 && (
+                        <button onClick={(e) => { onConfirm(usersToAdd) }}>
+                            <FontAwesomeIcon icon={faCheck} />
+                            Confirm
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     )

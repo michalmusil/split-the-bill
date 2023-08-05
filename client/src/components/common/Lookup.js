@@ -9,7 +9,6 @@ const Lookup = ({ fetchData, getItemStringRepresentation, onItemSelected, placeh
 
     const sendNewRequest = (searchQuery) => {
         clearTimeout(requestTimer)
-        console.log(searchQuery)
         if(searchQuery.length < 1){
             setResults([])
             return

@@ -9,6 +9,7 @@ import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import ShoppingItemsList from '../components/shoppings/ShoppingItemsList'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import AddUsersModal from '../components/modals/AddUsersModal'
+import HorizontalUsersList from "../components/users/HorizontalUsersList"
 
 const ShoppingDetail = ({ sessionService }) => {
     const navigate = useNavigate()
@@ -90,6 +91,23 @@ const ShoppingDetail = ({ sessionService }) => {
         })
     }
 
+    const assignUsersToShopping = async(users) => {
+        const addedUsers = []
+        for(let i = 0; i<users.length; i++){
+            const user = users[i]
+            try {
+                await axios.post(container.routing.assignUserToShopping(user.id, id), {},{
+                    headers: { Authorization: sessionService.getUserToken() }
+                })
+                addedUsers.push(user)
+            }
+            catch(err){
+                console.log(err)
+            }
+        }
+        setParticipants([...participants, ...addedUsers])
+    }
+
 
 
     return (
@@ -113,37 +131,42 @@ const ShoppingDetail = ({ sessionService }) => {
                 alreadyAssignedUsers={participants}
                 onDismiss={() => { setShowAddUsersModal(false) }}
                 onConfirm={(newUsers) => {
-
+                    assignUsersToShopping(newUsers)
+                    setShowAddUsersModal(false)
                 }} />
             )}
 
-            <div className="pageHeader">
-                <div className={cs.titleAndAuthorContainer}>
-                    <h1 className='pageTitle'>{shopping?.name}</h1>
-                    {shoppingCreator && (
-                        <span>{`Created by: ${shoppingCreator.username} (${shoppingCreator.email})`}</span>
-                    )}
-                </div>
-                
-                {shoppingCreator?.id === sessionService.getUser()?.id && ( 
+            <div className={cs.shoppingDetailContainer}>
+                <div className={cs.containerHeader}>
+                    <div className={cs.titleAndAuthorContainer}>
+                        <h1 className={cs.name}>{shopping?.name}</h1>
+                        <span>{`By: ${shoppingCreator?.username} (${shoppingCreator?.email})`}</span>
+                    </div>
+                    
                     <button className={cs.deleteButton} onClick={(e) => {
                         setShowDeleteModal(true)
                     }}>
                         <FontAwesomeIcon icon={faTrash} />
                         Delete
                     </button>
-                    )
-                }
-                
-            </div>
+                </div>
 
-            <div>
-                <h2>Participants</h2>
-                <button className="circularButton" onClick={(e) => {
-                    setShowAddUsersModal(true)
-                }}>
-                    <FontAwesomeIcon icon={faPlus} />
-                </button>
+                <div className={cs.participants}>
+                    <div className={cs.subHeader}>
+                        <h2>Participants</h2>
+                        <button className="circularButton" onClick={(e) => {
+                            setShowAddUsersModal(true)
+                        }}>
+                            <FontAwesomeIcon icon={faPlus} />
+                        </button>
+                    </div>
+                    <HorizontalUsersList
+                    users={participants}
+                    onUserClicked={(user) => {
+                        // TODO
+                    }} />
+                </div>
+
             </div>
 
             <div className={cs.shoppingDetailPageContent}>

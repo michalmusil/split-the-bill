@@ -1,8 +1,39 @@
 @import '../styles/Colors.css';
 
+.shoppingDetailContainer {
+    display: block;
+    background-color: var(--surface);
+    color: var(--onSurface);
+    width: 80%;
+    padding: 15px;
+    margin: 20px auto;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px var(--shadow);
+}
+
+.containerHeader {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.titleAndAuthorContainer {
+    border-bottom: 2px solid var(--primary);
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.titleAndAuthorContainer * {
+    display: block;
+    margin: 5px 0;
+    padding: 0;
+}
+
 .deleteButton {
     background-color: var(--error);
     box-shadow: 0px 0px 1px var(--error);
+    margin: auto 0;
 }
 
 .deleteButton:hover {
@@ -10,13 +41,29 @@
     box-shadow: 0px 0px 10px var(--error);
 }
 
-.titleAndAuthorContainer h1, .titleAndAuthorContainer span {
+.subHeader {
+    display: inline-block;
+    margin-bottom: 10px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.participants {
     display: block;
-    padding: 0 auto;
-    margin: 5px auto;
+    margin: 10px 0;
     text-align: left;
 }
 
-.titleAndAuthorContainer span {
-    margin-left: 20px;
+.participants h2 {
+    display: inline-block;
+    font-size: 1.05rem;
+    text-align: left;
+    margin-right: 20px;
+}
+
+.participants button {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 0.8rem;
 }
