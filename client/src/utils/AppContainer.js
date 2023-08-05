@@ -3,7 +3,7 @@ const baseUrl = "http://localhost:5050/api/v1"
 const routing = {
     logIn: `${baseUrl}/auth/login`,
     register: `${baseUrl}/auth/register`,
-    getAllShoppings: `${baseUrl}/shoppings`,
+    getAllShoppings: (searchQuery) => { return `${baseUrl}/shoppings${searchQuery ? `?search=${searchQuery}` : ""}`},
     getShoppingById: (id) => { return `${baseUrl}/shoppings/${id}` },
     postNewShopping: `${baseUrl}/shoppings`,
     getProductAssignmentsByShoppingId: (id) => { return `${baseUrl}/shoppings/${id}/productAssignments` },

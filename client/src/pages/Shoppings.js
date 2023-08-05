@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import ShoppingListItem from '../components/shoppings/ShoppingListItem'
 import NewShoppingModal from '../components/modals/NewShoppingModal'
+import TextSearch from '../components/common/TextSearch'
 
 const ShoppingsPage = ({ sessionService }) => {
     const [shoppings, setShoppings] = useState([])
@@ -24,8 +25,8 @@ const ShoppingsPage = ({ sessionService }) => {
         navigate(`/shoppings/${shopping.id}`)
     }
 
-    const fetchShoppings = () => {
-        axios.get(container.routing.getAllShoppings, { 
+    const fetchShoppings = (searchQuery) => {
+        axios.get(container.routing.getAllShoppings(searchQuery), { 
             headers: { Authorization: authToken } 
         }).then((res) => {
             setShoppings(res.data)
@@ -38,12 +39,23 @@ const ShoppingsPage = ({ sessionService }) => {
         <section className={cs.shoppingPageContent}>
             
             <div className='pageHeader'>
-                <h1 className='pageTitle'>Your shoppings</h1>
+                <div className="pageTitleWithActionsContainer">
+                    <h1 className='pageTitle'>Your shoppings</h1>
 
-                <button onClick={(e) => { setShowNewForm(!showNewForm) }}>
-                    <FontAwesomeIcon icon={faPlus} />
-                    Add new
-                </button>
+                    <button onClick={(e) => { setShowNewForm(!showNewForm) }}>
+                        <FontAwesomeIcon icon={faPlus} />
+                        Add new
+                    </button>
+                </div>
+                <div className="filterContainer">
+                    <TextSearch 
+                    onSearchConfirmed={(phrase) => {
+                        fetchShoppings(phrase)
+                    }}
+                    onSearchCancel={() => {
+                        fetchShoppings(null)
+                    }}/>
+                </div>
             </div>
             
             <div className={cs.shoppingsList}>

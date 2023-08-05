@@ -1,8 +1,5 @@
 @import './Colors.css';
-@font-face {
-  font-family: Comfortaa;
-  src: url('./fonts/Comfortaa.ttf');
-}
+@import './Fonts.css';
 
 :root{
   font-family: Comfortaa, Arial, Helvetica, sans-serif;
@@ -109,12 +106,20 @@ form textarea:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+}
+
+.pageTitleWithActionsContainer {
+  margin: 15px 0;
+  text-align: left;
 }
 
 .pageHeader .pageTitle {
-  display: inline-block;
+  display: block;
   font-size: 3rem;
   font-weight: bold;
+  margin: 5px;
+  padding: 0;
 }
 
 .modal, .modalOverlay{

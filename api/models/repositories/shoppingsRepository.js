@@ -22,7 +22,7 @@ const getShoppingsOfUser = async (userId, searchQuery) => {
     const [foundShoppings] = await database.query(`
         SELECT Shoppings.id, Shoppings.name, Shoppings.dueDateTime, Shoppings.description, Shoppings.creatorId, 
             SUM(Shoppings_products.quantity) AS numberOfItems, SUM(Shoppings_products.quantity * Shoppings_products.unitPrice) AS totalCost,
-            (COUNT(Users.id)) AS numberOfParticipants
+            (COUNT(DISTINCT(Users.id))) AS numberOfParticipants
         FROM Shoppings 
         LEFT JOIN Users_shoppings ON Shoppings.id = Users_shoppings.shoppingId
         LEFT JOIN Users ON Users_shoppings.userId = Users.id
@@ -44,7 +44,7 @@ const getShoppingOfUserById = async (id, userId) => {
     const [foundShopping] = await database.query(`
     SELECT Shoppings.id, Shoppings.name, Shoppings.dueDateTime, Shoppings.description, Shoppings.creatorId,
         SUM(Shoppings_products.quantity) AS numberOfItems, SUM(Shoppings_products.quantity * Shoppings_products.unitPrice) AS totalCost,
-        (COUNT(Users.id)) AS numberOfParticipants
+        (COUNT(DISTINCT(Users.id))) AS numberOfParticipants
     FROM Shoppings
     LEFT JOIN Users_shoppings ON Shoppings.id = Users_shoppings.shoppingId
     LEFT JOIN Users ON Users_shoppings.userId = Users.id
