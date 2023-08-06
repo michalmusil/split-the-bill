@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 
 
-const AppHeader = ({sessionService}) => {
+const AppHeader = ({ sessionService }) => {
     const navigate = useNavigate()
     const logout = async (e) => {
         await sessionService.logOut()

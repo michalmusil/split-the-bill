@@ -20,9 +20,12 @@ const ShoppingDetail = ({ sessionService }) => {
     const [shoppingItems, setShoppingItems] = useState([])
     const [participants, setParticipants] = useState([])
 
+    const [userIsAuthor, setUserIsAuthor] = useState(false)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [showAddUsersModal, setShowAddUsersModal] = useState(false)
-
+    
+    const [showRemoveUserModal, setShowRemoveUserModal] = useState(false)
+    const [userToBeRemoved, setUserToBeRemoved] = useState(null)
     
 
     useEffect(() => {
@@ -31,31 +34,26 @@ const ShoppingDetail = ({ sessionService }) => {
         fetchParticipants()
     }, [])
 
+    useEffect(() => {
+        if(shopping?.creatorId){
+            fetchShoppingCreator(shopping.creatorId)
+        }
+    }, [shopping])
+
     const fetchShoppingDetail = () => {
         axios.get(container.routing.getShoppingById(id), { 
             headers: {
                 Authorization: sessionService.getUserToken()
             }
         }).then((res) => {
+            const shopping = res.data
             setShopping(res.data)
-            fetchShoppingCreator(res.data.creatorId)
+            setUserIsAuthor(sessionService.getUserId() === shopping.creatorId)
         }).catch((err) => {
             // TODO
         })
     }
-
-    const fetchShoppingCreator = (id) => {
-        axios.get(container.routing.getUserById(id), { 
-            headers: {
-                Authorization: sessionService.getUserToken()
-            }
-        }).then((res) => {
-            setShoppingCreator(res.data)
-        }).catch((err) => {
-            // TODO
-        })
-    }
-
+    
     const fetchShoppingItems = () => {
         axios.get(container.routing.getProductAssignmentsByShoppingId(id), { 
             headers: {
@@ -79,6 +77,20 @@ const ShoppingDetail = ({ sessionService }) => {
             // TODO
         })
     }
+
+    const fetchShoppingCreator = (id) => {
+        axios.get(container.routing.getUserById(id), { 
+            headers: {
+                Authorization: sessionService.getUserToken()
+            }
+        }).then((res) => {
+            const creator = res.data
+            setShoppingCreator(creator)
+        }).catch((err) => {
+            // TODO
+        })
+    }
+
 
     const deleteShopping = () => {
         console.log("Deleted")
@@ -108,6 +120,22 @@ const ShoppingDetail = ({ sessionService }) => {
         setParticipants([...participants, ...addedUsers])
     }
 
+    const unassignUserFromShopping = async(user) => {
+        axios.delete(container.routing.unassignUserFromShopping(user.id, id), {
+            headers: { Authorization: sessionService.getUserToken() }
+        }).then((res) => {
+            const newParticipants = [...participants]
+            const index = newParticipants.indexOf(user)
+            newParticipants.splice(index, 1)
+
+            setParticipants(newParticipants)
+            setUserToBeRemoved(null)
+        }).catch((err) => {
+            setUserToBeRemoved(null)
+            // TODO
+        })
+    }
+
 
 
     return (
@@ -122,6 +150,22 @@ const ShoppingDetail = ({ sessionService }) => {
                 onConfirm={() => {
                     setShowDeleteModal(false)
                     deleteShopping()
+                }} />
+            )}
+
+            {showRemoveUserModal && (
+                <ConfirmationModal 
+                title={"Remove participant"} 
+                body={`Are you sure you want remove ${userToBeRemoved?.username || "user"} from this shopping? All the user's purchases will be removed.`}
+                onDismiss={() => { 
+                    setUserToBeRemoved(null)
+                    setShowRemoveUserModal(false)
+                 }}
+                onConfirm={() => {
+                    setShowRemoveUserModal(false)
+                    if (userToBeRemoved){
+                        unassignUserFromShopping(userToBeRemoved)
+                    }
                 }} />
             )}
 
@@ -140,15 +184,23 @@ const ShoppingDetail = ({ sessionService }) => {
                 <div className={cs.containerHeader}>
                     <div className={cs.titleAndAuthorContainer}>
                         <h1 className={cs.name}>{shopping?.name}</h1>
+                        
+                        {shopping?.description && (
+                            <p>{shopping.description}</p>
+                        )}
+
+                        {userIsAuthor && (
+                        <button className={cs.deleteButton} onClick={(e) => {
+                            setShowDeleteModal(true)
+                        }}>
+                            <FontAwesomeIcon icon={faTrash} />
+                            Delete
+                        </button>
+                        )}
+
                         <span>{`By: ${shoppingCreator?.username} (${shoppingCreator?.email})`}</span>
                     </div>
                     
-                    <button className={cs.deleteButton} onClick={(e) => {
-                        setShowDeleteModal(true)
-                    }}>
-                        <FontAwesomeIcon icon={faTrash} />
-                        Delete
-                    </button>
                 </div>
 
                 <div className={cs.participants}>
@@ -161,10 +213,18 @@ const ShoppingDetail = ({ sessionService }) => {
                         </button>
                     </div>
                     <HorizontalUsersList
+                    sessionService={sessionService}
                     users={participants}
                     onUserClicked={(user) => {
                         // TODO
-                    }} />
+                    }}
+                    onUserDelete={userIsAuthor ? (user) => {
+                        setUserToBeRemoved(user)
+                        setShowRemoveUserModal(true)
+                    }
+                    :
+                    null
+                    }/>
                 </div>
 
             </div>

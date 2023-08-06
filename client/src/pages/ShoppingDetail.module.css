@@ -1,21 +1,17 @@
-@import '../styles/Colors.css';
-
 .shoppingDetailContainer {
     display: block;
-    background-color: var(--surface);
+    /* background-color: var(--surface);
     color: var(--onSurface);
     width: 80%;
-    padding: 15px;
+    padding: 15px; */
     margin: 20px auto;
-    border-radius: 15px;
-    box-shadow: 0px 0px 10px var(--shadow);
+    /* border-radius: 15px;
+    box-shadow: 0px 0px 10px var(--shadow); */
 }
 
 .containerHeader {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-start;
 }
 
 .titleAndAuthorContainer {
@@ -24,9 +20,9 @@
     margin-bottom: 10px;
 }
 
-.titleAndAuthorContainer * {
+.titleAndAuthorContainer span, .titleAndAuthorContainer h1 {
     display: block;
-    margin: 5px 0;
+    margin: 15px 0;
     padding: 0;
 }
 

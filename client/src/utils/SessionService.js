@@ -20,6 +20,13 @@ class SessionService{
         return null
     }
 
+    getUserId(){
+        if (this.user != null){
+            return this.user.id
+        }
+        return null
+    }
+
     getUserToken(){
         if (this.user != null){
             return `Bearer ${this.user.token}`

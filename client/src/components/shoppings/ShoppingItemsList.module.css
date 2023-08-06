@@ -1,8 +1,6 @@
-@import '../../styles/Colors.css';
-
 .shoppingProductAssignmentsTable {
     background-color: var(--surface);
-    width: 80%;
+    width: 100%;
     margin: 20px auto;
     overflow: hidden;
     border-radius: 15px;

@@ -1,9 +1,9 @@
 import cs from "./HorizontalUsersList.module.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { faUser } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faXmark } from '@fortawesome/free-solid-svg-icons'
 
-const HorizontalUsersList = ({ users, onUserClicked }) => {
+const HorizontalUsersList = ({ sessionService, users, onUserClicked, onUserDelete=null }) => {
     
     return (
         <div className={cs.usersListContainer}>
@@ -17,6 +17,11 @@ const HorizontalUsersList = ({ users, onUserClicked }) => {
                                     <span className={cs.username}>{user.username}</span>
                                     <span className={cs.email}>{user.email}</span>
                                 </div>
+                                {onUserDelete !== null && user.id !== sessionService.getUserId() && (
+                                    <FontAwesomeIcon className={cs.deleteIcon} icon={faXmark} onClick={(e) => {
+                                        onUserDelete(user)
+                                    }}/>
+                                )}
                             </li>
                         )
                     })

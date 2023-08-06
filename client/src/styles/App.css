@@ -1,24 +1,34 @@
 @import './Colors.css';
 @import './Fonts.css';
 
-:root{
+:root {
   font-family: Comfortaa, Arial, Helvetica, sans-serif;
 }
 
+#root {
+  height: 100%;
+}
+
+* {
+  white-space: normal;
+  overflow-wrap: break-word;
+}
 
 
-
-
-body {
+html, body {
   margin: 0;
   background-color: var(--background);
   color: var(--onBackground);
-  min-height: 100%;
+  height: 100%;
 }
 
 section {
   display: block;
-  margin: 20px 40px;
+  margin: 50px 5%;
+}
+
+h1 {
+  font-size: 2.5rem;
 }
 
 button {
@@ -62,6 +72,8 @@ form input {
   margin: 0 auto;
   width: 100%;
   outline: none;
+  background-color: var(--transparent);
+  color: inherit;
   border: solid 1px var(--secondary);
   border-radius: 15px;
   padding: 10px 5px;
@@ -78,6 +90,8 @@ form textarea {
   margin: 0 auto;
   width: 100%;
   outline: none;
+  background-color: var(--transparent);
+  color: inherit;
   border: solid 1px var(--secondary);
   border-radius: 15px;
   padding: 10px 5px;
@@ -93,6 +107,7 @@ form textarea:focus {
 
 .App {
   text-align: center;
+  height: 100%;
 }
 
 .circularButton {

@@ -1,6 +1,3 @@
-@import '../../styles/Colors.css';
-@import '../../styles/Fonts.css';
-
 .searchContainer {
     display: flex;
     border-radius: 30px;
