@@ -1,0 +1,25 @@
+.userSection {
+    text-align: center;
+}
+
+.inlineWrapper {
+    display: inline-block;
+}
+
+.userSection h1 {
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.information {
+    text-align: left;
+}
+
+.username, .email {
+    font-size: 1.2rem;
+    margin: 10px auto;
+}
+
+span {
+    margin: 10px;
+}

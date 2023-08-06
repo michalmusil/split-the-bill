@@ -31,8 +31,8 @@
   .loginContainer form input {
     outline: none;
     border: solid 1px var(--secondary);
-    border-radius: 15px;
-    padding: 5px;
+    border-radius: 30px;
+    padding: 10px;
   
     box-shadow: 0px 0px 0px var(--secondary);
     transition: box-shadow 0.2s ease-in-out;

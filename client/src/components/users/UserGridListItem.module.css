@@ -1,0 +1,30 @@
+.itemContainer {
+    margin: 10px 15px;
+    padding: 30px 10px;
+    cursor: pointer;
+    text-align: center;
+    color: var(--onSurface);
+    border-radius: 15px;
+    box-shadow: 0px 0px 1px var(--shadow);
+    background-color: var(--surface);
+    transition: color 0.2s ease;
+    transition: box-shadow 0.2s ease;
+}
+
+.itemContainer:hover {
+    color: var(--onPrimary);
+    box-shadow: 0px 0px 10px var(--shadow);
+    background-image: linear-gradient(to bottom right, var(--surface), var(--surface), var(--primary));
+}
+
+.itemContainer svg {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.itemContainer strong, .itemContainer span {
+    display: block;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+}

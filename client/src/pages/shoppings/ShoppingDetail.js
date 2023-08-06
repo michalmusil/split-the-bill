@@ -2,14 +2,14 @@ import cs from "./ShoppingDetail.module.css"
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import axios from "axios"
-import container from '../utils/AppContainer'
+import container from '../../utils/AppContainer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
-import ShoppingItemsList from '../components/shoppings/ShoppingItemsList'
-import ConfirmationModal from '../components/modals/ConfirmationModal'
-import AddUsersModal from '../components/modals/AddUsersModal'
-import HorizontalUsersList from "../components/users/HorizontalUsersList"
+import ShoppingItemsList from '../../components/shoppings/ShoppingItemsList'
+import ConfirmationModal from '../../components/modals/ConfirmationModal'
+import AddUsersModal from '../../components/modals/AddUsersModal'
+import HorizontalUsersList from "../../components/users/HorizontalUsersList"
 
 const ShoppingDetail = ({ sessionService }) => {
     const navigate = useNavigate()
@@ -216,7 +216,7 @@ const ShoppingDetail = ({ sessionService }) => {
                     sessionService={sessionService}
                     users={participants}
                     onUserClicked={(user) => {
-                        // TODO
+                        navigate(`/users/${user.id}`)
                     }}
                     onUserDelete={userIsAuthor ? (user) => {
                         setUserToBeRemoved(user)

@@ -9,8 +9,10 @@ import AuthorizedLayout from './components/common/AuthorizedLayout'
 import UnauthorizedLayout from './components/common/UnauthorizedLayout'
 import LoginPage from './pages/Login'
 import HomePage from './pages/Home'
-import ShoppingsPage from './pages/Shoppings'
-import ShoppingDetail from './pages/ShoppingDetail'
+import ShoppingsPage from './pages/shoppings/Shoppings'
+import ShoppingDetail from './pages/shoppings/ShoppingDetail'
+import UsersPage from './pages/users/Users'
+import UserDetail from './pages/users/UserDetail'
 import NotFoundPage from './pages/NotFound'
 
 
@@ -39,6 +41,8 @@ function App() {
               <Route index element={ <HomePage /> } />
               <Route path='shoppings' element={ <ShoppingsPage sessionService={sessionService} /> } />
               <Route path='shoppings/:id' element={ <ShoppingDetail sessionService={sessionService} /> } />
+              <Route path='users' element={ <UsersPage sessionService={sessionService} /> } />
+              <Route path='users/:id' element={ <UserDetail sessionService={sessionService} /> } />
             </Route>
 
             <Route path='*' element={ <AuthorizedLayout sessionService={sessionService} /> }>

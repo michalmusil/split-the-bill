@@ -1,14 +1,14 @@
 import cs from "./Shoppings.module.css"
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import container from '../utils/AppContainer'
+import container from '../../utils/AppContainer'
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
-import ShoppingListItem from '../components/shoppings/ShoppingListItem'
-import NewShoppingModal from '../components/modals/NewShoppingModal'
-import TextSearch from '../components/common/TextSearch'
+import ShoppingListItem from '../../components/shoppings/ShoppingListItem'
+import NewShoppingModal from '../../components/modals/NewShoppingModal'
+import TextSearch from '../../components/common/TextSearch'
 
 const ShoppingsPage = ({ sessionService }) => {
     const [shoppings, setShoppings] = useState([])
@@ -38,6 +38,15 @@ const ShoppingsPage = ({ sessionService }) => {
     return (
         <section className={cs.shoppingPageContent}>
             
+            {showNewForm && (
+                <NewShoppingModal 
+                    onDismiss={ () => { setShowNewForm(false) } } 
+                    onShoppingAdded={ () => { fetchShoppings() } }
+                    sessionService={sessionService}
+                />
+                )
+            }
+
             <div className='pageHeader'>
                 <div className="pageTitleWithActionsContainer">
                     <h1 className='pageTitle'>Your shoppings</h1>
@@ -58,6 +67,12 @@ const ShoppingsPage = ({ sessionService }) => {
                 </div>
             </div>
             
+            {shoppings?.length < 1 && (
+                <div>
+                    <p>No shoppings have been found</p>
+                </div>
+            )}
+
             <div className={cs.shoppingsList}>
                 {
                     shoppings.map((shopping, key) => {
@@ -68,15 +83,6 @@ const ShoppingsPage = ({ sessionService }) => {
                 }
             </div>
             
-            {showNewForm && (
-                <NewShoppingModal 
-                    onDismiss={ () => { setShowNewForm(false) } } 
-                    onShoppingAdded={ () => { fetchShoppings() } }
-                    sessionService={sessionService}
-                />
-                )
-            }
-
         </section>
     )
 }
