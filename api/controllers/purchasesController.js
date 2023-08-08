@@ -12,7 +12,9 @@ const getPurchasesByProducts = async (req, res) => {
         return res.status(403).send({ message: 'You don\'t have permission to acces this shopping' })
     }
 
-    res.status(100).send()
+    const foundPurchases = await purchasesRepository.getPurchasesByProducts(shoppingId, userId)
+
+    res.status(200).send(foundPurchases)
 }
 
 

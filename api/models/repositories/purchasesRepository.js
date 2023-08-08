@@ -12,6 +12,7 @@ const getPurchasesByProducts = async (shoppingId, userId) => {
     
     whereClause += ` AND Purchases.shoppingId = ?`
     values.push(shoppingId)
+    values.push(shoppingId) // need it 2 times in the query
 
     if (Number(userId) || userId === 0){
         whereClause += ` AND Purchases.userId = ?`
@@ -20,11 +21,18 @@ const getPurchasesByProducts = async (shoppingId, userId) => {
 
     
     const [foundPurchases] = await database.query(`
-        SELECT Purchases.productId, Products.name, Products.description, SUM(Purchases.quantity) AS totalPurchased, 
-        JSON_ARRAYAGG(JSON_OBJECTAGG(Users.id, Users.username, Users.email, Purchases.quantity AS quantityPurchased)) AS users
+        WITH product_assignments AS (
+            SELECT productId, quantity, unitPrice, (quantity * unitPrice) AS totalPrice
+            FROM Shoppings_products
+            WHERE shoppingId = ?
+        )
+        SELECT Purchases.productId, Products.name, Products.description, CAST(SUM(Purchases.quantity) AS UNSIGNED) AS quantityPurchased, product_assignments.quantity AS quantityToBePurchased,
+        product_assignments.unitPrice AS unitPrice, (SUM(Purchases.quantity) * product_assignments.unitPrice) AS totalPurchased, product_assignments.totalPrice AS totalToBePurchased,
+        JSON_ARRAYAGG(JSON_OBJECT('id', Users.id, 'username', Users.username, 'email', Users.email, 'purchased', Purchases.quantity)) AS users
         FROM Purchases 
-        LEFT JOIN Products ON Shoppings_products.productId = Products.id
+        LEFT JOIN Products ON Purchases.productId = Products.id
         LEFT JOIN Users ON Purchases.UserId = Users.id
+        LEFT JOIN product_assignments ON Purchases.productId = product_assignments.productId
         ${whereClause}
         GROUP BY Purchases.productId
     `, values)
@@ -52,11 +60,12 @@ const getProductRemainingPurchases = async (productId, shoppingId) => {
     }
 
     const [result] = await database.query(`
-    SELECT COALESCE((MAX(Shoppings_products.quantity) - SUM(Purchases.quantity)), MAX(Shoppings_products.quantity)) AS remaining
-    FROM Purchases
-    RIGHT JOIN Shoppings_products ON Purchases.productId = Shoppings_products.productId
-    WHERE (Purchases.shoppingId = ? OR Shoppings_products.shoppingId = ?) AND (Purchases.productId = ? OR Shoppings_products.productId = ?)
-    `, [shoppingId, shoppingId, productId, productId])
+    WITH total_purchased AS (SELECT Purchases.productId AS productId, SUM(Purchases.quantity) AS quantity FROM Purchases WHERE Purchases.shoppingId = ? AND Purchases.productId = ?)
+    SELECT COALESCE((Shoppings_products.quantity - total_purchased.quantity), Shoppings_products.quantity) AS remaining
+    FROM Shoppings_products
+    LEFT JOIN total_purchased ON Shoppings_products.productId = total_purchased.productId
+    WHERE Shoppings_products.shoppingId = ? AND Shoppings_products.productId = ?
+    `, [shoppingId, productId, shoppingId, productId])
 
     const adjusted = result[0]
     return { remaining: Number(adjusted?.remaining) }
