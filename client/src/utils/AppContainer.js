@@ -20,6 +20,9 @@ const routing = {
     getUsers: (searchQuery) => { return `${baseUrl}/users${searchQuery ? `?searchString=${searchQuery}` : ""}`},
     
     getProductById: (id) => { return `${baseUrl}/products/${id}` },
+
+    getPurchasesOfProducts: (shoppingId, userId) => { return `${baseUrl}/purchases/${shoppingId}/getByProducts${userId ? `?userId=${userId}` : ""}`},
+    getPurchasesOfUsers: (shoppingId, userId) => { return `${baseUrl}/purchases/${shoppingId}/getByUsers${userId ? `?userId=${userId}` : ""}`},
 }
 
 const cookies = {

@@ -17,7 +17,6 @@ const ShoppingDetail = ({ sessionService }) => {
 
     const [shopping, setShopping] = useState(null)
     const [shoppingCreator, setShoppingCreator] = useState(null)
-    const [shoppingItems, setShoppingItems] = useState([])
     const [participants, setParticipants] = useState([])
 
     const [userIsAuthor, setUserIsAuthor] = useState(false)
@@ -30,7 +29,6 @@ const ShoppingDetail = ({ sessionService }) => {
 
     useEffect(() => {
         fetchShoppingDetail()
-        fetchShoppingItems()
         fetchParticipants()
     }, [])
 
@@ -49,18 +47,6 @@ const ShoppingDetail = ({ sessionService }) => {
             const shopping = res.data
             setShopping(res.data)
             setUserIsAuthor(sessionService.getUserId() === shopping.creatorId)
-        }).catch((err) => {
-            // TODO
-        })
-    }
-    
-    const fetchShoppingItems = () => {
-        axios.get(container.routing.getProductAssignmentsByShoppingId(id), { 
-            headers: {
-                Authorization: sessionService.getUserToken()
-            }
-        }).then((res) => {
-            setShoppingItems(res.data)
         }).catch((err) => {
             // TODO
         })
@@ -228,16 +214,12 @@ const ShoppingDetail = ({ sessionService }) => {
                 </div>
 
             </div>
-
-            <div className={cs.shoppingDetailPageContent}>
-                <ShoppingItemsList sessionService={sessionService} shoppingItems={shoppingItems} shopping={shopping}
-                    onItemAdded={(item) => {
-                        setShoppingItems([...shoppingItems, item])
-                    }}
-                    onItemUpdated={(item => {
-                        // TODO
-                    })}/>
+            
+            {shopping && (
+                <div className={cs.shoppingDetailPageContent}>
+                <ShoppingItemsList sessionService={sessionService} shopping={shopping} />
             </div>
+            )}
         </section>
     )
 }

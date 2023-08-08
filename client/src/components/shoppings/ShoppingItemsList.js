@@ -1,155 +1,85 @@
 import cs from './ShoppingItemsList.module.css'
 import axios from 'axios'
-import container from '../../utils/AppContainer'
 import { useState, useEffect } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import container from '../../utils/AppContainer'
 
-import { faXmark,faPlus, faCheck } from '@fortawesome/free-solid-svg-icons'
+import AddShoppingItemRow from './AddShoppingItemRow'
 
-const ShoppingItemsList = ({ sessionService, shopping, shoppingItems, onItemAdded, onItemUpdated }) => {
-    const [newItemCreateOn, setNewItemCreateOn] = useState(false)
-    const [newItemValid, setNewItemValid] = useState(false)
-    // Attributes of new shopping item to create
-    const [newItemName, setNewItemName] = useState(null)
-    const [newItemQuantity, setNewItemQuantity] = useState(null)
-    const [newItemUnitPrice, setNewItemUnitPrice] = useState(null)
-    const [error, setError] = useState(null)
-
+const ShoppingItemsList = ({ sessionService, shopping }) => {
+    const [shoppingItems, setShoppingItems] = useState(null)
+    const [productPurchases, setProductPurchases] = useState(null)
+    
     useEffect(() => {
-        const valid = newItemName && newItemQuantity
-        setNewItemValid(valid)
-    }, [newItemName, newItemQuantity, newItemUnitPrice])
+        fetchShoppingItems(shopping.id)
+        fetchProductPurchases(shopping.id)
+    }, [])
 
-    const addNewShoppingItem = (name, quantity, unitPrice) => {
-        const alreadyExistingItem = shoppingItems.filter((item) => { return item.name === name })
-        if (alreadyExistingItem.length > 0){
-            setError("This item is already part of the shopping")
-            return
-        }
-        axios.post(container.routing.addOrUpdateProductAssignment(shopping.id), {
-            productName: name,
-            quantity: quantity,
-            unitPrice: unitPrice
-        },
-        { headers: {
-            Authorization: sessionService.getUserToken()
-        }}).then((res) => {
-            const id = res.data.productId
-            const newItem = {
-                id: id,
-                name: name,
-                quantity: quantity,
-                unitPrice: unitPrice
+    
+
+    const fetchShoppingItems = (shoppingId) => {
+        axios.get(container.routing.getProductAssignmentsByShoppingId(shoppingId), { 
+            headers: {
+                Authorization: sessionService.getUserToken()
             }
-            onItemAdded(newItem)
-
-            endAddingNewItem()
+        }).then((res) => {
+            setShoppingItems(res.data)
         }).catch((err) => {
-            setError("Couldn't add new item")
+            // TODO
         })
     }
 
-    const endAddingNewItem = () => {
-        setNewItemCreateOn(false)
-        setNewItemName(null)
-        setNewItemQuantity(null)
-        setNewItemUnitPrice(null)
-        setError(null)
+    const fetchProductPurchases = (shoppingId) => {
+        axios.get(container.routing.getPurchasesOfProducts(shoppingId, null), { 
+            headers: {
+                Authorization: sessionService.getUserToken()
+            }
+        }).then((res) => {
+            setProductPurchases(res.data)
+        }).catch((err) => {
+            // TODO
+        })
     }
+
+    
 
     return (
         <table className={cs.shoppingProductAssignmentsTable}>
             <thead>
                 <tr className={cs.tableTitle}>
                     <th colSpan={4}>
-                        <h1>Shopping items</h1>
+                        <h1>Shopping list</h1>
                     </th>
                 </tr>
                 <tr className={cs.tableTitle}>
-                    <th>Name</th>
-                    <th>Quantity</th>
+                    <th>Product</th>
+                    <th>Quantity purchased / remaining</th>
                     <th>Unit price</th>
-                    <th>Total</th>
+                    <th>Ammount purchased / remaining</th>
                 </tr>
             </thead>
-            <tbody>
+            {shoppingItems !== null && productPurchases !== null && (
+                <tbody>
                 {shoppingItems.map((product, key) => {
+                    const purchased = productPurchases.filter((item) => {
+                        return item.productId === product.id
+                    })[0]
+
                     return (
                         <tr key={key}>
                             <td>{product.name}</td>
-                            <td>{product.quantity || "-"}</td>
+                            <td>{`${purchased?.quantityPurchased || "-"} / ${product.quantity || "-"}`}</td>
                             <td>{product.unitPrice ? `${product.unitPrice},-` : "-"}</td>
-                            <td>{product.unitPrice && product.quantity ?
-                                `${product.unitPrice * product.quantity},-`
-                                :
-                                "-"
-                            }</td>
+                            <td>{`${purchased?.ammountPurchased || "-"} / ${product.unitPrice && product.quantity ? product.unitPrice * product.quantity + ",-" : "-"}`}</td>
                         </tr>
                     )
                 })}
-                {newItemCreateOn && (
-                    <tr className={cs.newItemInputRow}>
-                        <td>
-                            <input type="text" placeholder="Name" onChange={(e) => { 
-                                setNewItemName(e.target.value || null) 
-                            }}/>
-                        </td>
-                        <td>
-                            <input type="number" placeholder="Quantity" onChange={(e) => { 
-                                const integerValue = parseInt(e.target.value)
-                                setNewItemQuantity(integerValue || null) 
-                            }}/></td>
-                        <td>
-                            <input type="number" placeholder="Unit price" onChange={(e) => { 
-                                const asNumber = Number(e.target.value)
-                                setNewItemUnitPrice(asNumber || null)
-                            }}/></td>
-                        <td>
-                            {newItemQuantity && newItemUnitPrice ? 
-                                `${newItemQuantity * newItemUnitPrice},-`
-                            :
-                                "-"
-                            }
-                        </td>
-                    </tr>
-                )}
                 
-                <tr className={cs.addButtonRow}>
-                    <td colSpan={4}>
-                        {!newItemCreateOn ? 
-                            <button className={cs.circularButtonAdd} onClick={ () => { setNewItemCreateOn(true) } }>
-                                <FontAwesomeIcon icon={faPlus} />
-                            </button>
-                        :
-                            <div className={cs.verticalButtonContainer}>
+                <AddShoppingItemRow sessionService={sessionService} shopping={shopping} shoppingItems={shoppingItems} onShoppingItemAdded={(newItem) => {
+                    setShoppingItems([...shoppingItems, newItem])
+                }} />
 
-                                {error && (
-                                    <span>{error}</span>
-                                )}
-
-                                <div className={cs.horizontalButtonContainer}>
-                                    <button className={cs.circularButtonConfirm} 
-                                        style={ 
-                                            newItemValid ? { backgroundColor: 'var(--secondary)' } : { backgroundColor: 'var(--disabled)', boxShadow: 'none', cursor: 'default', opacity: 100 }
-                                        }
-                                        onClick={(e) => {
-                                            if (newItemValid) {
-                                                addNewShoppingItem(newItemName, newItemQuantity, newItemUnitPrice)
-                                            }
-                                        }}
-                                        >
-                                        <FontAwesomeIcon icon={faCheck} />
-                                    </button>
-
-                                    <button className={cs.circularButtonCancel} onClick={ (e) => { endAddingNewItem() } }>
-                                        <FontAwesomeIcon icon={faXmark} />
-                                    </button>
-                                </div>
-                            </div>
-                        }
-                    </td>
-                </tr>
             </tbody>
+            )}
         </table>
     )
 }

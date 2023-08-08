@@ -11,9 +11,9 @@ const HorizontalUsersList = ({ sessionService, users, onUserClicked, onUserDelet
                 {
                     users.map((user, key) => {
                         return (
-                            <li key={key} className={cs.userItem} onClick={(e) => { onUserClicked(user) }}>
-                                <FontAwesomeIcon className={cs.userIcon} icon={faUser} />
-                                <div className={cs.userDetail}>
+                            <li key={key} className={cs.userItem}>
+                                <FontAwesomeIcon className={cs.userIcon} icon={faUser} onClick={(e) => { onUserClicked(user) }} />
+                                <div className={cs.userDetail} onClick={(e) => {onUserClicked(user)}}>
                                     <span className={cs.username}>{user.username}</span>
                                     <span className={cs.email}>{user.email}</span>
                                 </div>
