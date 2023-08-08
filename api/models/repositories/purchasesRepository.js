@@ -27,7 +27,7 @@ const getPurchasesByProducts = async (shoppingId, userId) => {
             WHERE shoppingId = ?
         )
         SELECT Purchases.productId, Products.name, Products.description, CAST(SUM(Purchases.quantity) AS UNSIGNED) AS quantityPurchased, product_assignments.quantity AS quantityToBePurchased,
-        product_assignments.unitPrice AS unitPrice, (SUM(Purchases.quantity) * product_assignments.unitPrice) AS totalPurchased, product_assignments.totalPrice AS totalToBePurchased,
+        product_assignments.unitPrice AS unitPrice, (SUM(Purchases.quantity) * product_assignments.unitPrice) AS ammountPurchased, product_assignments.totalPrice AS ammountToBePurchased,
         JSON_ARRAYAGG(JSON_OBJECT('id', Users.id, 'username', Users.username, 'email', Users.email, 'purchased', Purchases.quantity)) AS users
         FROM Purchases 
         LEFT JOIN Products ON Purchases.productId = Products.id
@@ -35,6 +35,51 @@ const getPurchasesByProducts = async (shoppingId, userId) => {
         LEFT JOIN product_assignments ON Purchases.productId = product_assignments.productId
         ${whereClause}
         GROUP BY Purchases.productId
+    `, values)
+
+    return foundPurchases
+}
+
+const getPurchasesByUsers = async (shoppingId, userId) => {
+    if (!Number(shoppingId) && shoppingId !== 0){
+        return []
+    }
+    
+    let whereClause = whereClauseBase
+    const values = []
+    
+    whereClause += ` AND Purchases.shoppingId = ?`
+    values.push(shoppingId)
+    values.push(shoppingId) // need it 2 times in the query
+
+    if (Number(userId) || userId === 0){
+        whereClause += ` AND Purchases.userId = ?`
+        values.push(userId)
+    }
+
+    
+    const [foundPurchases] = await database.query(`
+        WITH product_assignments AS (
+            SELECT productId, quantity, unitPrice, (quantity * unitPrice) AS totalPrice
+            FROM Shoppings_products
+            WHERE shoppingId = ?
+        )
+        SELECT Purchases.userId, Users.username, Users.email, CAST(SUM(Purchases.quantity) AS UNSIGNED) AS totalQuantityPurchased, SUM(Purchases.quantity * product_assignments.unitPrice) AS totalAmmountPurchased,
+        JSON_ARRAYAGG(JSON_OBJECT(
+            'id', Products.id, 
+            'name', Products.name, 
+            'description', Products.description, 
+            'quantityToBePurchased', product_assignments.quantity,
+            'unitPrice', product_assignments.unitPrice,
+            'quantityPurchased', Purchases.quantity,
+            'ammountPurchased', (Purchases.quantity * product_assignments.unitPrice)
+        )) AS purchasedProducts
+        FROM Purchases 
+        LEFT JOIN Users ON Purchases.userId = Users.id
+        LEFT JOIN Products ON Purchases.productId = Products.id
+        LEFT JOIN product_assignments ON Purchases.productId = product_assignments.productId
+        ${whereClause}
+        GROUP BY Purchases.userId
     `, values)
 
     return foundPurchases
@@ -119,6 +164,7 @@ const deletePurchase = async (shoppingId, productId, userId) => {
 
 module.exports = {
     getPurchasesByProducts,
+    getPurchasesByUsers,
     getPurchaseByIds,
     getProductRemainingPurchases,
     addNewPurchase,

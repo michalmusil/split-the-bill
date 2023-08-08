@@ -20,6 +20,26 @@ const getPurchasesByProducts = async (req, res) => {
 
 
 
+
+const getPurchasesByUsers = async (req, res) => {
+    const shoppingId = Number(req.params.shoppingId)
+    const { userId } = req.query
+    const loggedInUserId = req.user.id
+    
+    const userIsAuthorized = (await shopingsRepository.getShoppingOfUserById(shoppingId, loggedInUserId)) != null
+    if(!userIsAuthorized){
+        return res.status(403).send({ message: 'You don\'t have permission to acces this shopping' })
+    }
+
+    const foundPurchases = await purchasesRepository.getPurchasesByUsers(shoppingId, userId)
+
+    res.status(200).send(foundPurchases)
+}
+
+
+
+
+
 const addOrUpdatePurchase = async (req, res) => {
     const { shoppingId, productId, userId, quantity } = req.body
     const loggedInUserId = req.user.id
@@ -107,5 +127,6 @@ const addOrUpdatePurchase = async (req, res) => {
 
 module.exports = {
     getPurchasesByProducts,
+    getPurchasesByUsers,
     addOrUpdatePurchase
 }
