@@ -5,15 +5,15 @@ import SessionService from './utils/SessionService';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 
-import AuthorizedLayout from './components/common/AuthorizedLayout'
-import UnauthorizedLayout from './components/common/UnauthorizedLayout'
-import LoginPage from './pages/Login'
-import HomePage from './pages/Home'
+import AuthorizedLayout from './components/layouts/AuthorizedLayout'
+import UnauthorizedLayout from './components/layouts/UnauthorizedLayout'
+import LoginPage from './pages/login/Login'
+import HomePage from './pages/home/Home'
 import ShoppingsPage from './pages/shoppings/Shoppings'
-import ShoppingDetail from './pages/shoppings/ShoppingDetail'
+import ShoppingDetail from './pages/shopping_detail/ShoppingDetail'
 import UsersPage from './pages/users/Users'
-import UserDetail from './pages/users/UserDetail'
-import NotFoundPage from './pages/NotFound'
+import UserDetail from './pages/user_detail/UserDetail'
+import NotFoundPage from './pages/not_found/NotFound'
 
 
 

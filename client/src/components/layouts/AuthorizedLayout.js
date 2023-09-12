@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import AppHeader from "./AppHeader";
+import AppHeader from "./app_header/AppHeader";
 
 const AuthorizedLayout = ({ children, sessionService}) => {
     const navigate = useNavigate()

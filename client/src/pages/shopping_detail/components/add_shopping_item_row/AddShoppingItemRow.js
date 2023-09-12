@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import cs from './AddShoppingItemRow.module.css'
 import axios from 'axios'
-import container from '../../utils/AppContainer'
+import container from '../../../../utils/AppContainer'
 
 import { faXmark,faPlus, faCheck } from '@fortawesome/free-solid-svg-icons'
 

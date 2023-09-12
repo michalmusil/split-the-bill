@@ -2,7 +2,7 @@ import cs from "./Login.module.css"
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios'
-import container from '../utils/AppContainer'
+import container from '../../utils/AppContainer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faUser } from '@fortawesome/free-solid-svg-icons'

@@ -1,9 +1,9 @@
 import cs from './ShoppingItemsList.module.css'
 import axios from 'axios'
 import { useState, useEffect } from 'react'
-import container from '../../utils/AppContainer'
+import container from '../../../../utils/AppContainer'
 
-import AddShoppingItemRow from './AddShoppingItemRow'
+import AddShoppingItemRow from '../add_shopping_item_row/AddShoppingItemRow'
 
 const ShoppingItemsList = ({ sessionService, shopping }) => {
     const [shoppingItems, setShoppingItems] = useState(null)

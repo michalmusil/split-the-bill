@@ -1,13 +1,13 @@
 import { useState } from "react"
 import cs from "./AddUsersModal.module.css"
 import axios from "axios"
-import container from "../../utils/AppContainer"
+import container from "../../../utils/AppContainer"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 
-import Lookup from "../common/Lookup"
-import HorizontalUsersList from "../users/HorizontalUsersList"
+import Lookup from "../../ui/lookup/Lookup"
+import HorizontalUsersList from "../../../pages/shopping_detail/components/horizontal_users_list/HorizontalUsersList"
 
 const AddUserModal = ({ sessionService, onConfirm, onDismiss, alreadyAssignedUsers }) => {
     const [usersToAdd, setUsersToAdd] = useState([])

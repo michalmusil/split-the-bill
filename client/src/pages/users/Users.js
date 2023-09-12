@@ -3,8 +3,8 @@ import { useEffect, useState } from "react"
 import container from '../../utils/AppContainer'
 import axios from "axios"
 
-import TextSearch from "../../components/common/TextSearch"
-import UserGridListItem from "../../components/users/UserGridListItem"
+import TextSearch from "../../components/ui/text_search/TextSearch"
+import UserGridListItem from "./components/user_grid_list_item/UserGridListItem"
 import { useNavigate } from "react-router-dom"
 
 const Users = ({ sessionService }) => {

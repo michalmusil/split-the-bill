@@ -2,7 +2,7 @@ import cs from "./NewShoppingModal.module.css"
 import axios from "axios"
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import container from '../../utils/AppContainer'
+import container from '../../../../utils/AppContainer'
 
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 
