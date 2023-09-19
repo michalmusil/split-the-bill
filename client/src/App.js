@@ -18,42 +18,47 @@ import NotFoundPage from './pages/not_found/NotFound'
 
 
 
-
+let sessionService = null
 let sessionInitialized = false
-const sessionService = new SessionService(() => {
-  sessionInitialized = true
-})
-await sessionService.getStoredUserFromCookie()
+
+async function setup() {
+  sessionService = new SessionService(() => {
+    sessionInitialized = true
+  })
+  await sessionService.getStoredUserFromCookie()
+}
+
+await setup()
 
 
 function App() {
   return (
-    <Router>  
+    <Router>
       {sessionInitialized ?
-      <div className="App">
-                
+        <div className="App">
+
           <Routes>
-            <Route path='/auth' element={ <UnauthorizedLayout /> }>
-              <Route path='login' element={ <LoginPage sessionService={sessionService} /> }/>
-            </Route>
-            
-            <Route path='/' element={ <AuthorizedLayout sessionService={sessionService} /> }>
-              <Route index element={ <HomePage /> } />
-              <Route path='shoppings' element={ <ShoppingsPage sessionService={sessionService} /> } />
-              <Route path='shoppings/:id' element={ <ShoppingDetail sessionService={sessionService} /> } />
-              <Route path='users' element={ <UsersPage sessionService={sessionService} /> } />
-              <Route path='users/:id' element={ <UserDetail sessionService={sessionService} /> } />
+            <Route path='/auth' element={<UnauthorizedLayout />}>
+              <Route path='login' element={<LoginPage sessionService={sessionService} />} />
             </Route>
 
-            <Route path='*' element={ <AuthorizedLayout sessionService={sessionService} /> }>
-              <Route path='*' element={ <NotFoundPage /> } />
-            </Route> 
+            <Route path='/' element={<AuthorizedLayout sessionService={sessionService} />}>
+              <Route index element={<HomePage />} />
+              <Route path='shoppings' element={<ShoppingsPage sessionService={sessionService} />} />
+              <Route path='shoppings/:id' element={<ShoppingDetail sessionService={sessionService} />} />
+              <Route path='users' element={<UsersPage sessionService={sessionService} />} />
+              <Route path='users/:id' element={<UserDetail sessionService={sessionService} />} />
+            </Route>
+
+            <Route path='*' element={<AuthorizedLayout sessionService={sessionService} />}>
+              <Route path='*' element={<NotFoundPage />} />
+            </Route>
 
           </Routes>
 
-      </div> 
-      :
-      <></>
+        </div>
+        :
+        <></>
       }
     </Router>
   )
