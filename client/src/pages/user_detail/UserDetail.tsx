@@ -2,18 +2,30 @@ import cs from "./UserDetail.module.css"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { UsersRepository } from '../../data/stbApi'
+import { IUsersRepository, UsersRepository } from '../../data/stbApi'
 
 import { faEnvelope, faUser } from "@fortawesome/free-solid-svg-icons"
+import { ISessionService } from "../../services/sessionService"
+import { IUser } from "../../data/models/domain"
 
-const UserDetail = ({ sessionService }) => {
-    const { id } = useParams()
 
-    const [user, setUser] = useState(null)
+export interface UserDetailProps {
+    sessionService: ISessionService,
+    usersRepository: IUsersRepository
+}
+
+export interface UserDetailParams {
+    id: number
+}
+
+export const UserDetail = ({ sessionService, usersRepository }: UserDetailProps) => {
+    const { id } = useParams() as unknown as UserDetailParams
+
+    const [user, setUser] = useState<IUser | null>(null)
     const [isSelf, setIsSelf] = useState(false)
 
     useEffect(() => {
-        UsersRepository.getUserById(sessionService.getUserToken(), id).then((usr) => {
+        usersRepository.getUserById(id).then((usr) => {
             if (usr.id === sessionService.getUserId()) {
                 setIsSelf(true)
             }
@@ -43,5 +55,3 @@ const UserDetail = ({ sessionService }) => {
         </section>
     )
 }
-
-export default UserDetail

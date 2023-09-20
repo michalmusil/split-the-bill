@@ -1,34 +1,36 @@
 import './styles/App.css';
 import './styles/Colors.css';
 import './styles/Fonts.css';
-import SessionService from './utils/SessionService';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 
-import AuthorizedLayout from './components/layouts/AuthorizedLayout'
-import UnauthorizedLayout from './components/layouts/UnauthorizedLayout'
+import { AuthorizedLayout, AuthorizedLayoutProps } from './components/layouts/AuthorizedLayout'
+import { UnauthorizedLayout } from './components/layouts/UnauthorizedLayout'
 import LoginPage from './pages/login/Login'
 import HomePage from './pages/home/Home'
 import ShoppingsPage from './pages/shoppings/Shoppings'
 import ShoppingDetail from './pages/shopping_detail/ShoppingDetail'
-import UsersPage from './pages/users/Users'
-import UserDetail from './pages/user_detail/UserDetail'
+import { UsersProps, UsersPage } from './pages/users/Users'
+import { UserDetail } from './pages/user_detail/UserDetail'
 import NotFoundPage from './pages/not_found/NotFound'
+import { ISessionService } from './services/sessionService';
+import SessionService from './services/sessionService/sessionService';
+import { IUsersRepository, UsersRepository } from './data/stbApi';
 
 
 
-
-let sessionService = null
+// Initialization of session
 let sessionInitialized = false
+let sessionService: ISessionService = new SessionService(() => {
+  sessionInitialized = true
+})
+sessionService.getStoredUserFromCookie()
 
-async function setup() {
-  sessionService = new SessionService(() => {
-    sessionInitialized = true
-  })
-  await sessionService.getStoredUserFromCookie()
-}
 
-await setup()
+// Dependencies
+const usersRepository: IUsersRepository = new UsersRepository(sessionService);
+
+
 
 
 function App() {
@@ -46,8 +48,8 @@ function App() {
               <Route index element={<HomePage />} />
               <Route path='shoppings' element={<ShoppingsPage sessionService={sessionService} />} />
               <Route path='shoppings/:id' element={<ShoppingDetail sessionService={sessionService} />} />
-              <Route path='users' element={<UsersPage sessionService={sessionService} />} />
-              <Route path='users/:id' element={<UserDetail sessionService={sessionService} />} />
+              <Route path='users' element={<UsersPage sessionService={sessionService} usersRepository={usersRepository} />} />
+              <Route path='users/:id' element={<UserDetail sessionService={sessionService} usersRepository={usersRepository} />} />
             </Route>
 
             <Route path='*' element={<AuthorizedLayout sessionService={sessionService} />}>

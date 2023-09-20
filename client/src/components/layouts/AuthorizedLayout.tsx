@@ -1,13 +1,18 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import AppHeader from "./app_header/AppHeader";
+import { ISessionService } from "../../services/sessionService";
 
-const AuthorizedLayout = ({ children, sessionService}) => {
+
+export interface AuthorizedLayoutProps{
+    sessionService: ISessionService
+}
+
+export const AuthorizedLayout = ({ sessionService }: AuthorizedLayoutProps) => {
     const navigate = useNavigate()
 
     useEffect(() => {
         const loggedIn = sessionService.isAuthorized()
-        //console.log(`Logged in: ${loggedIn}`)
         if (!loggedIn){
             navigate('/auth/login', { replace: true })
         }
@@ -21,4 +26,3 @@ const AuthorizedLayout = ({ children, sessionService}) => {
     )
 }
 
-export default AuthorizedLayout

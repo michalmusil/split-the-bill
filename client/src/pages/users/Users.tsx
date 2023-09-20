@@ -1,21 +1,29 @@
 import cs from "./Users.module.css"
 import { useEffect, useState } from "react"
-import { UsersRepository } from '../../data/stbApi'
 
 import TextSearch from "../../components/ui/text_search/TextSearch"
 import UserGridListItem from "./components/user_grid_list_item/UserGridListItem"
 import { useNavigate } from "react-router-dom"
+import { ISessionService } from "../../services/sessionService"
+import { IUser } from "../../data/models/domain"
+import { IUsersRepository } from "../../data/stbApi"
 
-const Users = ({ sessionService }) => {
+
+export interface UsersProps {
+    sessionService: ISessionService
+    usersRepository: IUsersRepository
+}
+
+export const UsersPage = ({ sessionService, usersRepository }: UsersProps) => {
     const navigate = useNavigate()
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState<IUser[]>([])
 
     useEffect(() => {
         fetchUsers(null)
     }, [])
 
-    const fetchUsers = (query) => {
-        UsersRepository.getUsers(sessionService.getUserToken(), query).then((users) => {
+    const fetchUsers = (query: string | null) => {
+        usersRepository.getUsers(query).then((users) => {
             const loggedInUser = users.filter((user) => { return user.id === sessionService.getUserId() })[0]
             if (loggedInUser) {
                 const indexToRemove = users.indexOf(loggedInUser)
@@ -23,11 +31,11 @@ const Users = ({ sessionService }) => {
             }
             setUsers(users)
         }).catch((err) => {
-            // TODO
+            console.log(err)
         })
     }
 
-    const goToUserDetail = (user) => {
+    const goToUserDetail = (user: IUser) => {
         navigate(`/users/${user.id}`)
     }
 
@@ -39,7 +47,7 @@ const Users = ({ sessionService }) => {
                 </div>
                 <div className="filterContainer">
                     <TextSearch
-                        onSearchConfirmed={(phrase) => {
+                        onSearchConfirmed={(phrase: string) => {
                             fetchUsers(phrase)
                         }}
                         onSearchCancel={() => {
@@ -59,7 +67,9 @@ const Users = ({ sessionService }) => {
                     {users.map((user, key) => {
                         return (
                             <li key={key}>
-                                <UserGridListItem user={user} onClick={(user) => { goToUserDetail(user) }} />
+                                <UserGridListItem user={user} onClick={
+                                    (user: IUser) => { goToUserDetail(user) }
+                                } />
                             </li>
                         )
                     })}
@@ -68,5 +78,3 @@ const Users = ({ sessionService }) => {
         </section>
     )
 }
-
-export default Users

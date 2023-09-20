@@ -1,11 +1,9 @@
 import { Outlet } from "react-router-dom";
 
-const UnauthorizedLayout = () => {
+export const UnauthorizedLayout = () => {
     return (
         <>
             <Outlet />
         </>
     )
 }
-
-export default UnauthorizedLayout
