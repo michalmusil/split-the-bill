@@ -7,4 +7,6 @@ export default interface IShoppingsRepository {
     getShoppingById: (id: number) => Promise<IShopping>
     // Attempts to post a shopping, returns true if posting was successfull
     postShopping: (shoppingPost: IShoppingPost) => Promise<boolean>
+    // Attempts to delete a post, returns true if deletion was successfull
+    deleteShopping: (shoppingId: number) => Promise<boolean>
 }

@@ -25,4 +25,12 @@ export default class UsersRepository implements IUsersRepository {
         })
         return res.data as IUser
     }
+
+    async assignUserToShopping(userId: number, shoppingId: number): Promise<void> {
+        await axios.post(routes.assignUserToShopping(userId, shoppingId))
+    }
+
+    async unassignUserFromShopping(userId: number, shoppingId: number): Promise<void> {
+        await axios.delete(routes.unassignUserFromShopping(userId, shoppingId))
+    }
 }

@@ -12,7 +12,7 @@ const ShoppingItemsList = ({ sessionService, shopping }) => {
     useEffect(() => {
         fetchShoppingItems(shopping.id)
         fetchProductPurchases(shopping.id)
-    }, [])
+    }, [shopping])
 
     
 

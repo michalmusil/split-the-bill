@@ -10,11 +10,11 @@ import { LoginPage } from './pages/login/Login'
 import HomePage from './pages/home/Home'
 import { ShoppingsPage } from './pages/shoppings/Shoppings'
 import ShoppingDetail from './pages/shopping_detail/ShoppingDetail'
-import { UsersProps, UsersPage } from './pages/users/Users'
+import { UsersPage } from './pages/users/Users'
 import { UserDetail } from './pages/user_detail/UserDetail'
 import NotFoundPage from './pages/not_found/NotFound'
 import { ISessionService, SessionService } from './services/sessionService';
-import { AuthRepository, IAuthRepository, IShoppingsRepository, IUsersRepository, ShoppingsRepository, UsersRepository } from './data/stbApi';
+import { AuthRepository, IAuthRepository, IProductAssignmentsRepository, IPurchasesRepository, IShoppingsRepository, IUsersRepository, ProductAssignmentsRepository, PurchasesRepository, ShoppingsRepository, UsersRepository } from './data/stbApi';
 
 
 
@@ -27,9 +27,11 @@ sessionService.getStoredUserFromCookie()
 
 
 // Dependencies
-const usersRepository: IUsersRepository = new UsersRepository(sessionService);
-const authRepository: IAuthRepository = new AuthRepository();
-const shoppingsRepository: IShoppingsRepository = new ShoppingsRepository(sessionService);
+const usersRepository: IUsersRepository = new UsersRepository(sessionService)
+const authRepository: IAuthRepository = new AuthRepository()
+const shoppingsRepository: IShoppingsRepository = new ShoppingsRepository(sessionService)
+const productAssignmentsRepository: IProductAssignmentsRepository = new ProductAssignmentsRepository(sessionService)
+const purchasesRepository: IPurchasesRepository = new PurchasesRepository(sessionService)
 
 
 

@@ -26,15 +26,23 @@ export default class ShoppingsRepository implements IShoppingsRepository {
     }
 
     async postShopping(shoppingPost: IShoppingPost): Promise<boolean> {
-        try{
+        try {
             await axios.post(routes.postNewShopping, shoppingPost,
                 { headers: { Authorization: this.sessionService.getUserToken() } })
             return true
-        } catch(err){
+        } catch (err) {
             return false
         }
+    }
 
-        
+    async deleteShopping(shoppingId: number): Promise<boolean> {
+        try {
+            await axios.delete(routes.deleteShopping(shoppingId),
+                { headers: { Authorization: this.sessionService.getUserToken() } })
+            return true
+        } catch (err) {
+            return false
+        }
     }
 
 }

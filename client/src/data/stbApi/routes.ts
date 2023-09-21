@@ -21,7 +21,7 @@ export default {
 
     getProductById: (id: number) => { return `${baseUrl}/products/${id}` },
 
-    getPurchasesOfProducts: (shoppingId: number, userId: number | null) => { return `${baseUrl}/purchases/${shoppingId}/getByProducts${userId ? `?userId=${userId}` : ""}` },
-    getPurchasesOfUsers: (shoppingId: number, userId: number | null) => { return `${baseUrl}/purchases/${shoppingId}/getByUsers${userId ? `?userId=${userId}` : ""}` },
+    getPurchasesGroupedByProducts: (shoppingId: number, userId: number | null) => { return `${baseUrl}/purchases/${shoppingId}/getByProducts${userId ? `?userId=${userId}` : ""}` },
+    getPurchasesGroupedByUsers: (shoppingId: number, userId: number | null) => { return `${baseUrl}/purchases/${shoppingId}/getByUsers${userId ? `?userId=${userId}` : ""}` },
 }
 
