@@ -2,8 +2,25 @@ import cs from "./HorizontalUsersList.module.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faUser, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { ISessionService } from "../../../../services/sessionService"
+import { IUser } from "../../../../data/models/domain"
 
-const HorizontalUsersList = ({ sessionService, users, onUserClicked, onUserDelete=null }) => {
+/**
+ * @param users List of users to display in the list
+ * @param onUserClicked Specifies what happens when user item is clicked
+ * @param onUserDelete If not null, deletion icon will be displayed for every user item. Specifies what happens, when user clicks on the delete icon
+ */
+export interface HorizontalUsersListProps {
+    sessionService: ISessionService
+    users: IUser[]
+    onUserClicked: (user: IUser) => void
+    onUserDelete: ((user: IUser) => void) | null
+}
+
+/**
+ * A simple horizontal list of pill-shaped user list items, with optional functionalityAdded
+ */
+export const HorizontalUsersList = ({ sessionService, users, onUserClicked, onUserDelete }: HorizontalUsersListProps) => {
     
     return (
         <div className={cs.usersListContainer}>
@@ -30,5 +47,3 @@ const HorizontalUsersList = ({ sessionService, users, onUserClicked, onUserDelet
         </div>
     )
 }
-
-export default HorizontalUsersList

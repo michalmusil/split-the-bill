@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import AppHeader from "./app_header/AppHeader";
+import { AppHeader } from "./app_header/AppHeader";
 import { ISessionService } from "../../services/sessionService";
 
 

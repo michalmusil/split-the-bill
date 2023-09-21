@@ -7,9 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import ShoppingItemsList from './components/shopping_items_list/ShoppingItemsList'
-import ConfirmationModal from '../../components/modals/confirmation/ConfirmationModal'
-import AddUsersModal from '../../components/modals/add_users/AddUsersModal'
-import HorizontalUsersList from "./components/horizontal_users_list/HorizontalUsersList"
+import { ConfirmationModal } from '../../components/modals/confirmation/ConfirmationModal'
+import { AddUsersModal } from './components/add_users_modal/AddUsersModal'
+import { HorizontalUsersList } from "./components/horizontal_users_list/HorizontalUsersList"
 
 const ShoppingDetail = ({ sessionService }) => {
     const navigate = useNavigate()

@@ -2,7 +2,7 @@ import cs from "./UserDetail.module.css"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { IUsersRepository, UsersRepository } from '../../data/stbApi'
+import { IUsersRepository } from '../../data/stbApi'
 
 import { faEnvelope, faUser } from "@fortawesome/free-solid-svg-icons"
 import { ISessionService } from "../../services/sessionService"
@@ -33,7 +33,7 @@ export const UserDetail = ({ sessionService, usersRepository }: UserDetailProps)
         }).catch((err) => {
             // TODO
         })
-    }, [])
+    }, [id])
 
     return (
         <section className={cs.userSection}>

@@ -4,18 +4,32 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons'
 
-const TextSearch = ({ placeholder="Search", onSearchConfirmed, onSearchCancel }) => {
+/**
+ * @param placeholder A string that is displayed when no text input has been given by the user
+ * @param onSearchConfirmed Function that gets triggered by user clicking search button or pressing enter when input has been given
+ * @param onSearchCancel After a search has been triggered, cancel button appears in the field, after clicking, the effects of the search should be cancelled
+ */
+export type TextSearchProps = {
+    placeholder?: string
+    onSearchConfirmed: (searchPhrase: string) => void
+    onSearchCancel: () => void
+}
+
+/**
+ * A general string search field.
+ */
+export const TextSearch = ({ placeholder="Search", onSearchConfirmed, onSearchCancel }: TextSearchProps) => {
     const [searchPhrase, setSearchPhrase] = useState("")
     const [searchWasConfirmed, setSearchWasConfirmed] = useState(false)
 
-    const attemptSearch = () => {
+    const attemptSearch = (): void => {
         if(searchPhrase && searchPhrase.length > 0){
             onSearchConfirmed(searchPhrase)
             setSearchWasConfirmed(true)
         }
     }
 
-    const cancelSearch = () => {
+    const cancelSearch = (): void => {
         setSearchPhrase("")
         setSearchWasConfirmed(false)
         onSearchCancel()
@@ -49,5 +63,3 @@ const TextSearch = ({ placeholder="Search", onSearchConfirmed, onSearchCancel })
         </div>
     )
 }
-
-export default TextSearch

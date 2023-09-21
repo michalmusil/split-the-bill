@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import ShoppingListItem from './components/shopping_list_item/ShoppingListItem'
 import NewShoppingModal from './components/new_shopping_modal/NewShoppingModal'
-import TextSearch from '../../components/ui/text_search/TextSearch'
+import { TextSearch } from '../../components/ui/text_search/TextSearch'
 
 const ShoppingsPage = ({ sessionService }) => {
     const [shoppings, setShoppings] = useState([])

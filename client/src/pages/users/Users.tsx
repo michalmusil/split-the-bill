@@ -1,7 +1,7 @@
 import cs from "./Users.module.css"
 import { useEffect, useState } from "react"
 
-import TextSearch from "../../components/ui/text_search/TextSearch"
+import { TextSearch } from "../../components/ui/text_search/TextSearch"
 import UserGridListItem from "./components/user_grid_list_item/UserGridListItem"
 import { useNavigate } from "react-router-dom"
 import { ISessionService } from "../../services/sessionService"
