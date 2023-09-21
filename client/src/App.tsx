@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 import { AuthorizedLayout, AuthorizedLayoutProps } from './components/layouts/AuthorizedLayout'
 import { UnauthorizedLayout } from './components/layouts/UnauthorizedLayout'
-import LoginPage from './pages/login/Login'
+import { LoginPage } from './pages/login/Login'
 import HomePage from './pages/home/Home'
 import ShoppingsPage from './pages/shoppings/Shoppings'
 import ShoppingDetail from './pages/shopping_detail/ShoppingDetail'
@@ -15,7 +15,7 @@ import { UserDetail } from './pages/user_detail/UserDetail'
 import NotFoundPage from './pages/not_found/NotFound'
 import { ISessionService } from './services/sessionService';
 import SessionService from './services/sessionService/sessionService';
-import { IUsersRepository, UsersRepository } from './data/stbApi';
+import { AuthRepository, IAuthRepository, IUsersRepository, UsersRepository } from './data/stbApi';
 
 
 
@@ -29,6 +29,7 @@ sessionService.getStoredUserFromCookie()
 
 // Dependencies
 const usersRepository: IUsersRepository = new UsersRepository(sessionService);
+const authRepository: IAuthRepository = new AuthRepository();
 
 
 
@@ -41,7 +42,7 @@ function App() {
 
           <Routes>
             <Route path='/auth' element={<UnauthorizedLayout />}>
-              <Route path='login' element={<LoginPage sessionService={sessionService} />} />
+              <Route path='login' element={<LoginPage sessionService={sessionService} authRepository={authRepository}/>} />
             </Route>
 
             <Route path='/' element={<AuthorizedLayout sessionService={sessionService} />}>
