@@ -1,7 +1,7 @@
 import { ISessionService } from "./iSessionService"
-import SessionService from "../../utils/SessionService"
+import SessionService from "./sessionService"
 
-export type {
-    ISessionService,
+export {
+    type ISessionService,
     SessionService
 }
