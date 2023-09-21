@@ -1,6 +1,6 @@
 import IProductAssignmentsRepository from "./iProductAssignmentsRepository";
 import { ISessionService } from "../../../../services/sessionService";
-import { IProductAssignment } from "../../../models/domain";
+import { IPostProductAssignment, IProductAssignment } from "../../../models/domain";
 import routes from "../../routes";
 import axios from "axios";
 
@@ -18,4 +18,17 @@ export default class ProductAssignmentsRepository implements IProductAssignments
         return res.data as IProductAssignment[]
     }
 
+    async assignProductToShopping(shoppingId: number, productAssignment: IPostProductAssignment): Promise<IProductAssignment> {
+        const res = await axios.post(routes.addOrUpdateProductAssignment(shoppingId), productAssignment,
+            { headers: { Authorization: this.sessionService.getUserToken() } })
+
+        const newAssignmentId = res.data.productId as number
+        return {
+            id: newAssignmentId,
+            name: productAssignment.productName,
+            description: productAssignment.description,
+            quantity: productAssignment.quantity,
+            unitPrice: productAssignment.unitPrice
+        }
+    }
 }

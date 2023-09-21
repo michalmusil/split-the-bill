@@ -1,7 +1,5 @@
 import cs from "./Shoppings.module.css"
-import axios from 'axios'
 import { useEffect, useState } from 'react'
-import container from '../../utils/AppContainer'
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 

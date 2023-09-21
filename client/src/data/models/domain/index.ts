@@ -7,6 +7,7 @@ import IPurchaseOfProduct from "./purchases/iPurchaseOfProduct"
 import IPurchaseOfUser from "./purchases/iPurchaseOfUser"
 import IProductWithPurchase from "./purchases/iProductWithPurchase"
 import IUserWithPurchase from "./purchases/iUserWithPurchase"
+import IPostProductAssignment from "./products/iPostProductAssignment"
 
 
 export {
@@ -18,5 +19,6 @@ export {
     type IPurchaseOfProduct,
     type IPurchaseOfUser,
     type IProductWithPurchase,
-    type IUserWithPurchase
+    type IUserWithPurchase,
+    type IPostProductAssignment,
 }

@@ -1,76 +1,78 @@
 import cs from "./ShoppingDetail.module.css"
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import axios from "axios"
-import container from '../../utils/AppContainer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
-import ShoppingItemsList from './components/shopping_items_list/ShoppingItemsList'
+import { ShoppingItemsList } from './components/shopping_items_list/ShoppingItemsList'
 import { ConfirmationModal } from '../../components/modals/confirmation/ConfirmationModal'
 import { AddUsersModal } from './components/add_users_modal/AddUsersModal'
 import { HorizontalUsersList } from "./components/horizontal_users_list/HorizontalUsersList"
+import { ISessionService } from "../../services/sessionService"
+import { IProductAssignmentsRepository, IPurchasesRepository, IShoppingsRepository, IUsersRepository } from "../../data/stbApi"
+import { IShopping, IUser } from "../../data/models/domain"
 
-const ShoppingDetail = ({ sessionService }) => {
+export interface ShoppingDetailParams{
+    id: number
+}
+
+export interface ShoppingDetailProps{
+    sessionService: ISessionService
+    shoppingsRepository: IShoppingsRepository
+    usersRepository: IUsersRepository
+    productAssignmentsRepository: IProductAssignmentsRepository
+    purchasesRepository: IPurchasesRepository
+}
+
+export const ShoppingDetail = ({ sessionService, shoppingsRepository, usersRepository, productAssignmentsRepository, purchasesRepository }: ShoppingDetailProps) => {
     const navigate = useNavigate()
-    const { id } = useParams()
+    const { id } = useParams() as unknown as ShoppingDetailParams
 
-    const [shopping, setShopping] = useState(null)
-    const [shoppingCreator, setShoppingCreator] = useState(null)
-    const [participants, setParticipants] = useState([])
+    const [shopping, setShopping] = useState<IShopping | null>(null)
+    const [shoppingCreator, setShoppingCreator] = useState<IUser | null>(null)
+    const [participants, setParticipants] = useState<IUser[]>([])
 
     const [userIsAuthor, setUserIsAuthor] = useState(false)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [showAddUsersModal, setShowAddUsersModal] = useState(false)
     
     const [showRemoveUserModal, setShowRemoveUserModal] = useState(false)
-    const [userToBeRemoved, setUserToBeRemoved] = useState(null)
+    const [userToBeRemoved, setUserToBeRemoved] = useState<IUser | null>(null)
     
 
     useEffect(() => {
         fetchShoppingDetail()
         fetchParticipants()
-    }, [])
+    }, [id])
 
     useEffect(() => {
-        if(shopping?.creatorId){
+        if(shopping != null){
             fetchShoppingCreator(shopping.creatorId)
         }
     }, [shopping])
 
-    const fetchShoppingDetail = () => {
-        axios.get(container.routing.getShoppingById(id), { 
-            headers: {
-                Authorization: sessionService.getUserToken()
-            }
-        }).then((res) => {
-            const shopping = res.data
-            setShopping(res.data)
-            setUserIsAuthor(sessionService.getUserId() === shopping.creatorId)
+    const fetchShoppingDetail = (): void => {
+        shoppingsRepository.getShoppingById(id)
+        .then((shp) => {
+            setShopping(shp)
+            setUserIsAuthor(sessionService.getUserId() == shp.creatorId)
         }).catch((err) => {
             // TODO
         })
     }
 
-    const fetchParticipants = () => {
-        axios.get(container.routing.getUsersOfShoppingByShoppingId(id), { 
-            headers: {
-                Authorization: sessionService.getUserToken()
-            }
-        }).then((res) => {
-            setParticipants(res.data)
+    const fetchParticipants = (): void => {
+        usersRepository.getUsersOfShopping(id)
+        .then((users) => {
+            setParticipants(users)
         }).catch((err) => {
             // TODO
         })
     }
 
-    const fetchShoppingCreator = (id) => {
-        axios.get(container.routing.getUserById(id), { 
-            headers: {
-                Authorization: sessionService.getUserToken()
-            }
-        }).then((res) => {
-            const creator = res.data
+    const fetchShoppingCreator = (userId: number): void => {
+        usersRepository.getUserById(userId)
+        .then((creator) => {
             setShoppingCreator(creator)
         }).catch((err) => {
             // TODO
@@ -78,25 +80,25 @@ const ShoppingDetail = ({ sessionService }) => {
     }
 
 
-    const deleteShopping = () => {
-        console.log("Deleted")
-        axios.delete(container.routing.deleteShopping(id), {
-            headers: { Authorization: sessionService.getUserToken() }
-        }).then((res) => {
-            navigate(-1)
+    const deleteShopping = (): void => {
+        shoppingsRepository.deleteShopping(id)
+        .then((success) => {
+            if(success){
+                navigate(-1)
+            } else {
+                // TODO
+            }
         }).catch((err) => {
             // TODO
         })
     }
 
-    const assignUsersToShopping = async(users) => {
+    const assignUsersToShopping = async (users: IUser[]): Promise<void> => {
         const addedUsers = []
         for(let i = 0; i<users.length; i++){
             const user = users[i]
             try {
-                await axios.post(container.routing.assignUserToShopping(user.id, id), {},{
-                    headers: { Authorization: sessionService.getUserToken() }
-                })
+                await usersRepository.assignUserToShopping(user.id, id)
                 addedUsers.push(user)
             }
             catch(err){
@@ -106,10 +108,9 @@ const ShoppingDetail = ({ sessionService }) => {
         setParticipants([...participants, ...addedUsers])
     }
 
-    const unassignUserFromShopping = async(user) => {
-        axios.delete(container.routing.unassignUserFromShopping(user.id, id), {
-            headers: { Authorization: sessionService.getUserToken() }
-        }).then((res) => {
+    const unassignUserFromShopping = async (user: IUser): Promise<void> => {
+        usersRepository.unassignUserFromShopping(user.id, id)
+        .then((res) => {
             const newParticipants = [...participants]
             const index = newParticipants.indexOf(user)
             newParticipants.splice(index, 1)
@@ -158,6 +159,7 @@ const ShoppingDetail = ({ sessionService }) => {
             {showAddUsersModal && (
                 <AddUsersModal 
                 sessionService={sessionService}
+                usersRepository={usersRepository}
                 alreadyAssignedUsers={participants}
                 onDismiss={() => { setShowAddUsersModal(false) }}
                 onConfirm={(newUsers) => {
@@ -217,10 +219,10 @@ const ShoppingDetail = ({ sessionService }) => {
             
             {shopping && (
                 <div className={cs.shoppingDetailPageContent}>
-                <ShoppingItemsList sessionService={sessionService} shopping={shopping} />
+                <ShoppingItemsList sessionService={sessionService} productAssignmentsRepository={productAssignmentsRepository} 
+                purchasesRepository={purchasesRepository} shopping={shopping} />
             </div>
             )}
         </section>
     )
 }
-export default ShoppingDetail

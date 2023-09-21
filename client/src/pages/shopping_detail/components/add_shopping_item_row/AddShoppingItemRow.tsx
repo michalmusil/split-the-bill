@@ -1,57 +1,63 @@
 import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import cs from './AddShoppingItemRow.module.css'
-import axios from 'axios'
-import container from '../../../../utils/AppContainer'
 
 import { faXmark,faPlus, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { ISessionService } from '../../../../services/sessionService'
+import { IProductAssignmentsRepository } from '../../../../data/stbApi'
+import { IPostProductAssignment, IProductAssignment, IShopping } from '../../../../data/models/domain'
 
-const AddShoppingItemRow = ({ sessionService, shopping, shoppingItems, onShoppingItemAdded}) => {
+export interface AddShoppingItemRowProps{
+    sessionService: ISessionService
+    productAssignmentsRepository: IProductAssignmentsRepository
+    shopping: IShopping
+    productAssignments: IProductAssignment[]
+    onProductAssignmentAdded: (newAssignment: IProductAssignment) => void
+}
+
+export const AddShoppingItemRow = ({ sessionService, productAssignmentsRepository, shopping, productAssignments, onProductAssignmentAdded}: AddShoppingItemRowProps) => {
 
     const [newItemCreateOn, setNewItemCreateOn] = useState(false)
-    const [newItemValid, setNewItemValid] = useState(false)
+    const [newAssignmentValid, setNewItemValid] = useState(false)
     // Attributes of new shopping item to create
-    const [newItemName, setNewItemName] = useState(null)
-    const [newItemQuantity, setNewItemQuantity] = useState(null)
-    const [newItemUnitPrice, setNewItemUnitPrice] = useState(null)
-    const [error, setError] = useState(null)
+    const [newAssignmentName, setNewItemName] = useState<string | null>(null)
+    const [newAssignmentQuantity, setNewItemQuantity] = useState<number | null>(null)
+    const [newAssignmentUnitPrice, setNewItemUnitPrice] = useState<number | null>(null)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        const quantityAsNumber = Number(newItemQuantity)
-        const valid = newItemName && quantityAsNumber && Number.isInteger(quantityAsNumber) && quantityAsNumber > 0
+        const valid: boolean = newAssignmentName != null && newAssignmentQuantity != null && Number.isInteger(newAssignmentQuantity) && newAssignmentQuantity > 0
         setNewItemValid(valid)
-    }, [newItemName, newItemQuantity, newItemUnitPrice])
+    }, [newAssignmentName, newAssignmentQuantity, newAssignmentUnitPrice])
 
-    const addNewShoppingItem = (name, quantity, unitPrice) => {
-        const alreadyExistingItem = shoppingItems.filter((item) => { return item.name === name })
+    const postNewProductAssignment = async (): Promise<void> => {
+        if(!newAssignmentValid){
+            setError("The new item is not valid")
+            return
+        }
+        const alreadyExistingItem = productAssignments.filter((item) => { return item.name == newAssignmentName })
         if (alreadyExistingItem.length > 0){
             setError("This item is already part of the shopping")
             return
         }
-        axios.post(container.routing.addOrUpdateProductAssignment(shopping.id), {
-            productName: name,
-            quantity: quantity,
-            unitPrice: unitPrice
-        },
-        { headers: {
-            Authorization: sessionService.getUserToken()
-        }}).then((res) => {
-            const id = res.data.productId
-            const newItem = {
-                id: id,
-                name: name,
-                quantity: quantity,
-                unitPrice: unitPrice
-            }
-            onShoppingItemAdded(newItem)
+        
+        const post: IPostProductAssignment = {
+            productName: newAssignmentName!,
+            description: null,
+            quantity: newAssignmentQuantity!,
+            unitPrice: newAssignmentUnitPrice
+        }
 
-            endAddingNewItem()
-        }).catch((err) => {
+        try{
+            const addedAssignment = await productAssignmentsRepository.assignProductToShopping(shopping.id, post)
+            onProductAssignmentAdded(addedAssignment)
+            endAddingNewAssignment()
+        } catch(err){
             setError("Couldn't add new item")
-        })
+        }
     }
 
-    const endAddingNewItem = () => {
+    const endAddingNewAssignment = (): void => {
         setNewItemCreateOn(false)
         setNewItemName(null)
         setNewItemQuantity(null)
@@ -80,8 +86,8 @@ const AddShoppingItemRow = ({ sessionService, shopping, shoppingItems, onShoppin
                             setNewItemUnitPrice(asNumber || null)
                         }}/></td>
                     <td>
-                        {newItemQuantity && newItemUnitPrice ? 
-                            `${newItemQuantity * newItemUnitPrice},-`
+                        {newAssignmentQuantity && newAssignmentUnitPrice ? 
+                            `${newAssignmentQuantity * newAssignmentUnitPrice},-`
                         :
                             "-"
                         }
@@ -105,18 +111,18 @@ const AddShoppingItemRow = ({ sessionService, shopping, shoppingItems, onShoppin
                             <div className={cs.horizontalButtonContainer}>
                                 <button className={cs.circularButtonConfirm} 
                                     style={ 
-                                        newItemValid ? { backgroundColor: 'var(--secondary)' } : { backgroundColor: 'var(--disabled)', boxShadow: 'none', cursor: 'default', opacity: 100 }
+                                        newAssignmentValid ? { backgroundColor: 'var(--secondary)' } : { backgroundColor: 'var(--disabled)', boxShadow: 'none', cursor: 'default', opacity: 100 }
                                     }
                                     onClick={(e) => {
-                                        if (newItemValid) {
-                                            addNewShoppingItem(newItemName, newItemQuantity, newItemUnitPrice)
+                                        if (newAssignmentValid) {
+                                            postNewProductAssignment()
                                         }
                                     }}
                                     >
                                     <FontAwesomeIcon icon={faCheck} />
                                 </button>
 
-                                <button className={cs.circularButtonCancel} onClick={ (e) => { endAddingNewItem() } }>
+                                <button className={cs.circularButtonCancel} onClick={ (e) => { endAddingNewAssignment() } }>
                                     <FontAwesomeIcon icon={faXmark} />
                                 </button>
                             </div>
@@ -127,5 +133,3 @@ const AddShoppingItemRow = ({ sessionService, shopping, shoppingItems, onShoppin
         </>
     )
 }
-
-export default AddShoppingItemRow

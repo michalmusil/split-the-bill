@@ -1,7 +1,5 @@
 import { useState } from "react"
 import cs from "./AddUsersModal.module.css"
-import axios from "axios"
-import container from "../../../../utils/AppContainer"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faCheck } from '@fortawesome/free-solid-svg-icons'

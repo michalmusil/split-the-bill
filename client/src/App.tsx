@@ -9,7 +9,7 @@ import { UnauthorizedLayout } from './components/layouts/UnauthorizedLayout'
 import { LoginPage } from './pages/login/Login'
 import HomePage from './pages/home/Home'
 import { ShoppingsPage } from './pages/shoppings/Shoppings'
-import ShoppingDetail from './pages/shopping_detail/ShoppingDetail'
+import { ShoppingDetail } from './pages/shopping_detail/ShoppingDetail'
 import { UsersPage } from './pages/users/Users'
 import { UserDetail } from './pages/user_detail/UserDetail'
 import NotFoundPage from './pages/not_found/NotFound'
@@ -50,7 +50,8 @@ function App() {
             <Route path='/' element={<AuthorizedLayout sessionService={sessionService} />}>
               <Route index element={<HomePage />} />
               <Route path='shoppings' element={<ShoppingsPage sessionService={sessionService} shoppingsRepository={shoppingsRepository} />} />
-              <Route path='shoppings/:id' element={<ShoppingDetail sessionService={sessionService} />} />
+              <Route path='shoppings/:id' element={<ShoppingDetail sessionService={sessionService} usersRepository={usersRepository} 
+              purchasesRepository={purchasesRepository} productAssignmentsRepository={productAssignmentsRepository} shoppingsRepository={shoppingsRepository} />} />
               <Route path='users' element={<UsersPage sessionService={sessionService} usersRepository={usersRepository} />} />
               <Route path='users/:id' element={<UserDetail sessionService={sessionService} usersRepository={usersRepository} />} />
             </Route>
