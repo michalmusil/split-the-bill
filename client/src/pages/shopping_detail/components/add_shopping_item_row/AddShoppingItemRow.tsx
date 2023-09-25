@@ -96,7 +96,7 @@ export const AddShoppingItemRow = ({ sessionService, productAssignmentsRepositor
             )}
             
             <tr className={cs.addButtonRow}>
-                <td colSpan={4}>
+                <td colSpan={5}>
                     {!newItemCreateOn ? 
                         <button className={cs.circularButtonAdd} onClick={ () => { setNewItemCreateOn(true) } }>
                             <FontAwesomeIcon icon={faPlus} />

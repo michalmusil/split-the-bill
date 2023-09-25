@@ -1,6 +1,7 @@
 import cs from './ShoppingItemsList.module.css'
 import { useState, useEffect } from 'react'
 
+import { ShoppingItemRow } from '../shopping_item_row/ShoppingItemRow'
 import { AddShoppingItemRow } from '../add_shopping_item_row/AddShoppingItemRow'
 import { ISessionService } from '../../../../services/sessionService'
 import { IProductAssignmentsRepository, IPurchasesRepository } from '../../../../data/stbApi'
@@ -47,15 +48,16 @@ export const ShoppingItemsList = ({ sessionService, productAssignmentsRepository
         <table className={cs.shoppingProductAssignmentsTable}>
             <thead>
                 <tr className={cs.tableTitle}>
-                    <th colSpan={4}>
+                    <th colSpan={5}>
                         <h1>Shopping list</h1>
                     </th>
                 </tr>
                 <tr className={cs.tableTitle}>
                     <th>Product</th>
-                    <th>Quantity purchased / remaining</th>
+                    <th>Purchased Qty</th>
                     <th>Unit price</th>
-                    <th>Ammount purchased / remaining</th>
+                    <th>Purchased $</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             {assignedProducts !== null && productPurchases !== null && (
@@ -66,13 +68,21 @@ export const ShoppingItemsList = ({ sessionService, productAssignmentsRepository
                         })[0]
 
                         return (
-                            <tr key={key}>
-                                <td>{product.name}</td>
-                                <td>{`${purchased?.quantityPurchased || "-"} / ${product.quantity || "-"}`}</td>
-                                <td>{product.unitPrice ? `${product.unitPrice},-` : "-"}</td>
-                                <td>{`${purchased?.ammountPurchased || "-"} / ${product.unitPrice && product.quantity ? product.unitPrice * product.quantity + ",-" : "-"}`}</td>
-                            </tr>
+                            <ShoppingItemRow
+                                itemKey={product.id}
+                                productAssignmentRepository={productAssignmentsRepository}
+                                product={product}
+                                purchaseOfProduct={purchased}
+                                shopping={shopping} />
                         )
+                        // return (
+                        //     <tr key={key}>
+                        //         <td>{product.name}</td>
+                        //         <td>{`${purchased?.quantityPurchased || "-"} / ${product.quantity || "-"}`}</td>
+                        //         <td>{product.unitPrice ? `${product.unitPrice},-` : "-"}</td>
+                        //         <td>{`${purchased?.ammountPurchased || "-"} / ${product.unitPrice && product.quantity ? product.unitPrice * product.quantity + ",-" : "-"}`}</td>
+                        //     </tr>
+                        // )
                     })}
 
                     <AddShoppingItemRow sessionService={sessionService} productAssignmentsRepository={productAssignmentsRepository}

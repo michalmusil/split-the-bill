@@ -31,4 +31,18 @@ export default class ProductAssignmentsRepository implements IProductAssignments
             unitPrice: productAssignment.unitPrice
         }
     }
+
+    async updateProductAssignment(shoppingId: number, productAssignment: IPostProductAssignment): Promise<IProductAssignment> {
+        const res = await axios.post(routes.addOrUpdateProductAssignment(shoppingId), productAssignment,
+            { headers: { Authorization: this.sessionService.getUserToken() } })
+
+        const newAssignmentId = res.data.productId as number
+        return {
+            id: newAssignmentId,
+            name: productAssignment.productName,
+            description: productAssignment.description,
+            quantity: productAssignment.quantity,
+            unitPrice: productAssignment.unitPrice
+        }
+    }
 }

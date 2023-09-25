@@ -23,12 +23,3 @@
     border-bottom: 1px solid var(--primary);
 }
 
-.shoppingProductAssignmentsTable tbody tr td{
-    padding: 20px 0;
-    font-size: 0.8em;
-    border-bottom: 0.5px solid var(--shadow);
-}
-
-.shoppingProductAssignmentsTable tbody tr:last-child td{
-    border: none;
-}

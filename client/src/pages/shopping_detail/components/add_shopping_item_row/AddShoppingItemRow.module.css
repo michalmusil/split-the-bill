@@ -75,13 +75,3 @@ input {
     background-image: none;
     outline: none;
 }
-
-/* DISABLE ARROWS IN NUMBER INPUTS */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type=number] {
-  -moz-appearance: textfield;
-}

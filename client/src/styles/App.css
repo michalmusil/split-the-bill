@@ -85,6 +85,16 @@ form input:focus {
   box-shadow: 0px 0px 10px var(--secondary);
 }
 
+/* DISABLE ARROWS IN NUMBER INPUTS */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 form textarea {
   display: block;
   margin: 0 auto;
