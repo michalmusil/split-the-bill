@@ -158,6 +158,33 @@ const deletePurchase = async (shoppingId, productId, userId) => {
     return result.affectedRows > 0
 }
 
+const deleteAllPurchasesOfUser = async (shoppingId, userId) => {
+    if((!Number(shoppingId) && shoppingId !== 0) || (!Number(userId) && userId !== 0)){
+        return false
+    }
+
+    const [result] = await database.query(`
+    DELETE FROM Purchases 
+    WHERE shoppingId = ? AND userId = ?
+    `,
+    [shoppingId, userId]
+    )
+    return result.affectedRows > 0
+}
+
+const deleteAllPurchasesOfProduct = async (shoppingId, productId) => {
+    if((!Number(shoppingId) && shoppingId !== 0) || (!Number(productId) && productId !== 0)){
+        return false
+    }
+
+    const [result] = await database.query(`
+    DELETE FROM Purchases 
+    WHERE shoppingId = ? AND productId = ?
+    `,
+    [shoppingId, productId]
+    )
+    return result.affectedRows > 0
+}
 
 
 
@@ -169,5 +196,7 @@ module.exports = {
     getProductRemainingPurchases,
     addNewPurchase,
     updateExistingPurchase,
-    deletePurchase
+    deletePurchase,
+    deleteAllPurchasesOfUser,
+    deleteAllPurchasesOfProduct,
 }

@@ -1,32 +1,40 @@
 import cs from "./ShoppingItemRow.module.css"
 import { useEffect, useRef, useState } from "react"
-import { IPostProductAssignment, IProductAssignment, IPurchaseOfProduct, IShopping } from "../../../../data/models/domain"
+import { IPostProductAssignment, IProductAssignment, IPurchaseOfProduct, IShopping, IUser } from "../../../../data/models/domain"
 import { ShoppingItemRowState } from './ShoppingItemRowState'
-import { IProductAssignmentsRepository } from "../../../../data/stbApi"
+import { IProductAssignmentsRepository, IPurchasesRepository } from "../../../../data/stbApi"
 import { useOnClickOutside } from "../../../../hooks"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faPencil, faCheck, faCartShopping, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { ConfirmationModal } from "../../../../components/modals/confirmation/ConfirmationModal"
+import { PurchaseItemModal } from "../purchase_item_modal/PurchaseItemModal"
+import { ISessionService } from "../../../../services/sessionService"
 
 export interface ShoppingItemRowProps {
-    itemKey: number
+    sessionService: ISessionService
     productAssignmentRepository: IProductAssignmentsRepository
+    purchasesRepository: IPurchasesRepository
     shopping: IShopping
+    shoppingParticipants: IUser[]
     product: IProductAssignment
     purchaseOfProduct: IPurchaseOfProduct | null
     onProductUpdated: (updatedProduct: IProductAssignment) => void
     onProductDeleted: () => void
+    onPurchaseUpdated: () => void
 }
 
 const quantityInputId = "quantityInput"
 const unitPriceInputId = "unitPriceInput"
 
-export const ShoppingItemRow = ({ itemKey, productAssignmentRepository, shopping, product, purchaseOfProduct, onProductUpdated, onProductDeleted }: ShoppingItemRowProps) => {
+export const ShoppingItemRow = ({ sessionService, productAssignmentRepository, purchasesRepository,
+     shopping, shoppingParticipants, product, purchaseOfProduct, onProductUpdated, onProductDeleted, onPurchaseUpdated }: ShoppingItemRowProps) => {
     const [rowState, setRowState] = useState<ShoppingItemRowState>(ShoppingItemRowState.IDLE)
     const [editableQuantity, setEditableQuantity] = useState<number>(product.quantity)
     const [editableUnitPrice, setEditableUnitPrice] = useState<number | null>(product.unitPrice)
+
     const [showDeleteItemModal, setShowDeleteItemModal] = useState(false)
+    const [showPurchaseItemModal, setShowPurchaseItemModal] = useState(false)
 
     const quantityInputRef = useRef(null)
     const unitPriceInputRef = useRef(null)
@@ -65,6 +73,7 @@ export const ShoppingItemRow = ({ itemKey, productAssignmentRepository, shopping
 
     const updateProductAssignmentQuantity = (newQuantity: number): void => {
         let newValue = newQuantity
+        // Minimum of the new quantity is the quantity already purchased by users
         if (purchaseOfProduct != null) {
             newValue = newValue < purchaseOfProduct.quantityPurchased ? purchaseOfProduct.quantityPurchased : newValue
         }
@@ -77,8 +86,6 @@ export const ShoppingItemRow = ({ itemKey, productAssignmentRepository, shopping
         productAssignmentRepository.updateProductAssignment(shopping.id, post)
             .then((updatedAssignment) => {
                 onProductUpdated(updatedAssignment)
-                //product.quantity = updatedAssignment.quantity
-                //setEditableFields()
             })
             .catch((err) => {
                 setEditableQuantity(product.quantity)
@@ -106,8 +113,8 @@ export const ShoppingItemRow = ({ itemKey, productAssignmentRepository, shopping
         productAssignmentRepository.updateProductAssignment(shopping.id, post)
             .then((updatedAssignment) => {
                 onProductUpdated(updatedAssignment)
-                // product.unitPrice = updatedAssignment.unitPrice
-                // setEditableFields()
+                // When unit price changes, so do the purchases (money ammounts)
+                onPurchaseUpdated()
             })
             .catch((err) => {
                 setEditableUnitPrice(product.unitPrice)
@@ -127,11 +134,30 @@ export const ShoppingItemRow = ({ itemKey, productAssignmentRepository, shopping
             body="All purchases of this item will be cancelled."
             onConfirm={() => {
                 deleteProductAssignment()
+                setShowDeleteItemModal(false)
             }}
             onDismiss={() => {
                 setShowDeleteItemModal(false)
             }} />
-        <tr className={cs.shoppingItemRow} key={itemKey}>
+
+        <PurchaseItemModal
+            isShown={showPurchaseItemModal}
+            existingPurchase={purchaseOfProduct}
+            participantsOfShopping={shoppingParticipants}
+            productAssignment={product}
+            purchasesRepository={purchasesRepository}
+            sessionService={sessionService}
+            shopping={shopping}
+            onDismiss={() => {
+                setShowPurchaseItemModal(false)
+            }}
+            onConfirm={() => {
+                onPurchaseUpdated()
+                setShowPurchaseItemModal(false)
+            }}
+        />
+
+        <tr className={cs.shoppingItemRow}>
             <td>{product.name}</td>
 
             <td>
@@ -204,10 +230,13 @@ export const ShoppingItemRow = ({ itemKey, productAssignmentRepository, shopping
                 }
             </td>
 
-            <td>{`${purchaseOfProduct?.ammountPurchased || "-"} / ${editableUnitPrice && editableQuantity ? editableUnitPrice * editableQuantity + ",-" : "-"}`}</td>
+            <td>{`${purchaseOfProduct && editableUnitPrice ? purchaseOfProduct.quantityPurchased * editableUnitPrice : "-"} / ${editableUnitPrice && editableQuantity ? editableUnitPrice * editableQuantity + ",-" : "-"}`}</td>
 
             <td>
-                <div className={`${cs.actionIcon} ${cs.purchaseIcon}`}>
+                <div className={`${cs.actionIcon} ${cs.purchaseIcon}`}
+                    onClick={(e) => {
+                        setShowPurchaseItemModal(true)
+                    }}>
                     <FontAwesomeIcon icon={faCartShopping} />
                 </div>
                 <div className={`${cs.actionIcon} ${cs.deleteIcon}`}

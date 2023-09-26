@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IPurchaseOfProduct, IPurchaseOfUser } from "../../../models/domain";
+import { IPostProductPurchase, IPurchaseOfProduct, IPurchaseOfUser } from "../../../models/domain";
 import IPurchasesRepository from "./iPurchasesRepository";
 import routes from "../../routes";
 import { ISessionService } from "../../../../services/sessionService";
@@ -22,6 +22,11 @@ export default class PurchasesRepository implements IPurchasesRepository {
         { headers: { Authorization: this.sessionService.getUserToken() } })
 
         return res.data as IPurchaseOfUser[]
+    }
+
+    async purchaseProduct(purchaseProductPost: IPostProductPurchase): Promise<void> {
+        await axios.post(routes.addOrUpdateProductPurchase(), purchaseProductPost, 
+        { headers: { Authorization: this.sessionService.getUserToken() } })
     }
 
 }

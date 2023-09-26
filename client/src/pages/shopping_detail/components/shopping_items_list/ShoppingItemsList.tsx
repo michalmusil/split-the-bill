@@ -5,28 +5,31 @@ import { ShoppingItemRow } from '../shopping_item_row/ShoppingItemRow'
 import { AddShoppingItemRow } from '../add_shopping_item_row/AddShoppingItemRow'
 import { ISessionService } from '../../../../services/sessionService'
 import { IProductAssignmentsRepository, IPurchasesRepository } from '../../../../data/stbApi'
-import { IProductAssignment, IPurchaseOfProduct, IShopping } from '../../../../data/models/domain'
+import { IProductAssignment, IPurchaseOfProduct, IShopping, IUser } from '../../../../data/models/domain'
 
 export interface ShoppingItemsListProps {
     sessionService: ISessionService
     productAssignmentsRepository: IProductAssignmentsRepository
     purchasesRepository: IPurchasesRepository
     shopping: IShopping
+    shoppingParticipants: IUser[]
 }
 
-export const ShoppingItemsList = ({ sessionService, productAssignmentsRepository, purchasesRepository, shopping }: ShoppingItemsListProps) => {
+export const ShoppingItemsList = ({ sessionService, productAssignmentsRepository, purchasesRepository, shopping, shoppingParticipants }: ShoppingItemsListProps) => {
     const [assignedProducts, setAssignedProducts] = useState<IProductAssignment[] | null>(null)
     const [productPurchases, setProductPurchases] = useState<IPurchaseOfProduct[] | null>(null)
 
     useEffect(() => {
-        fetchAssignedProducts(shopping.id)
-        fetchPurchasesOfProducts(shopping.id)
+        fetchAssignedProducts()
+        fetchPurchasesOfProducts()
     }, [shopping])
 
+    useEffect(() => {
+        fetchPurchasesOfProducts()
+    }, [shoppingParticipants])
 
-
-    const fetchAssignedProducts = (shoppingId: number): void => {
-        productAssignmentsRepository.getProductAssignmentsOfShopping(shoppingId)
+    const fetchAssignedProducts = (): void => {
+        productAssignmentsRepository.getProductAssignmentsOfShopping(shopping.id)
             .then((assignments) => {
                 setAssignedProducts(assignments)
             }).catch((err) => {
@@ -34,8 +37,8 @@ export const ShoppingItemsList = ({ sessionService, productAssignmentsRepository
             })
     }
 
-    const fetchPurchasesOfProducts = (shoppingId: number): void => {
-        purchasesRepository.getPurchasesGroupedByProducts(shoppingId, null).then((purchases) => {
+    const fetchPurchasesOfProducts = (): void => {
+        purchasesRepository.getPurchasesGroupedByProducts(shopping.id, null).then((purchases) => {
             setProductPurchases(purchases)
         }).catch((err) => {
             // TODO
@@ -64,16 +67,19 @@ export const ShoppingItemsList = ({ sessionService, productAssignmentsRepository
                 <tbody>
                     {assignedProducts.map((product, key) => {
                         const purchased = productPurchases.filter((item) => {
-                            return item.productId === product.id
+                            return item.productId == product.id
                         })[0]
 
                         return (
                             <ShoppingItemRow
-                                itemKey={product.id}
+                                key={key}
+                                sessionService={sessionService}
+                                purchasesRepository={purchasesRepository}
+                                shoppingParticipants={shoppingParticipants}
                                 productAssignmentRepository={productAssignmentsRepository}
                                 product={product}
                                 purchaseOfProduct={purchased}
-                                shopping={shopping} 
+                                shopping={shopping}
                                 onProductUpdated={(newProduct) => {
                                     const newProductAssignments = [...assignedProducts]
                                     newProductAssignments[key] = newProduct
@@ -81,19 +87,14 @@ export const ShoppingItemsList = ({ sessionService, productAssignmentsRepository
                                 }}
                                 onProductDeleted={() => {
                                     const start = assignedProducts.slice(0, key)
-                                    const end = assignedProducts.slice(key+1, assignedProducts.length)
+                                    const end = assignedProducts.slice(key + 1, assignedProducts.length)
                                     setAssignedProducts([...start, ...end])
                                 }}
-                                />
+                                onPurchaseUpdated={() => {
+                                    fetchPurchasesOfProducts()
+                                }}
+                            />
                         )
-                        // return (
-                        //     <tr key={key}>
-                        //         <td>{product.name}</td>
-                        //         <td>{`${purchased?.quantityPurchased || "-"} / ${product.quantity || "-"}`}</td>
-                        //         <td>{product.unitPrice ? `${product.unitPrice},-` : "-"}</td>
-                        //         <td>{`${purchased?.ammountPurchased || "-"} / ${product.unitPrice && product.quantity ? product.unitPrice * product.quantity + ",-" : "-"}`}</td>
-                        //     </tr>
-                        // )
                     })}
 
                     <AddShoppingItemRow sessionService={sessionService} productAssignmentsRepository={productAssignmentsRepository}

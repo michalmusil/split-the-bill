@@ -94,17 +94,20 @@ export const ShoppingDetail = ({ sessionService, shoppingsRepository, usersRepos
     }
 
     const assignUsersToShopping = async (users: IUser[]): Promise<void> => {
-        const addedUsers = []
+        const requests: Promise<void>[] = []
+        const addedUsers: IUser[] = []
         for (let i = 0; i < users.length; i++) {
             const user = users[i]
-            try {
-                await usersRepository.assignUserToShopping(user.id, id)
-                addedUsers.push(user)
-            }
-            catch (err) {
-                console.log(err)
-            }
+            const request = usersRepository.assignUserToShopping(user.id, id)
+                .then(() => {
+                    addedUsers.push(user)
+                })
+                .catch((err) => {
+                    // TODO
+                })
+            requests.push(request)
         }
+        await Promise.all(requests)
         setParticipants([...participants, ...addedUsers])
     }
 
@@ -217,8 +220,12 @@ export const ShoppingDetail = ({ sessionService, shoppingsRepository, usersRepos
 
             {shopping && (
                 <div className={cs.shoppingDetailPageContent}>
-                    <ShoppingItemsList sessionService={sessionService} productAssignmentsRepository={productAssignmentsRepository}
-                        purchasesRepository={purchasesRepository} shopping={shopping} />
+                    <ShoppingItemsList
+                        sessionService={sessionService}
+                        productAssignmentsRepository={productAssignmentsRepository}
+                        purchasesRepository={purchasesRepository}
+                        shopping={shopping}
+                        shoppingParticipants={participants} />
                 </div>
             )}
         </section>

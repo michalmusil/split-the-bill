@@ -1,4 +1,5 @@
 const shoppingsRepository = require('../models/repositories/shoppingsRepository')
+const purchasesRepository = require('../models/repositories/purchasesRepository')
 const usersRepository = require('../models/repositories/usersRepository')
 const productsRepository = require('../models/repositories/productsRepository')
 
@@ -208,7 +209,7 @@ const unassignUserFromShopping = async(req, res) => {
     const userIsAuthorized = (shoppingToUnassignFrom.creatorId !== userToUnassignId) && 
         ((shoppingToUnassignFrom.creatorId === loggedInUserId) || (userToUnassignId === loggedInUserId))
     if(!userIsAuthorized){
-        return res.status(403).send({ message: 'Creator can only unassign assigned users. Assigned user can only unassign him/herself' })
+        return res.status(403).send({ message: 'Creator can only unassign other users. Assigned user can only unassign him/herself' })
     }
 
     const userToUnassign = await usersRepository.getUserById(userToUnassignId)
@@ -222,6 +223,9 @@ const unassignUserFromShopping = async(req, res) => {
     if (!userAssignmentDeleted){
         return res.status(500).send({ message: 'Could not unassign user from shopping' })
     }
+
+    // Finally any purchases made by the unassigned user in this shoppinng must be deleted as well
+    await purchasesRepository.deleteAllPurchasesOfUser(shoppingId, userToUnassignId)
 
     return res.status(200).send()
 }
@@ -269,7 +273,7 @@ const addOrUpdateProduct = async(req, res) => {
     // If yes, just update it
     if(productAssignment != null){
         const updated = await shoppingsRepository.updateProductToShopping(shoppingId, productId, quantity, unitPrice)
-        return res.status(204).send({ productId: productId ,message: 'Product assignment to shopping updated' })
+        return res.status(200).send({ productId: productId ,message: 'Product assignment to shopping updated' })
     }
     // If not, create the assignment
     const newAssignmentId = await shoppingsRepository.addProductToShopping(shoppingId, productId, quantity, unitPrice)
@@ -313,6 +317,9 @@ const removeProduct = async (req, res) => {
     if(!removed){
         return res.status(500).send({ message: 'Removing product from shopping failed' })
     }
+
+    // Finally must delete all purchases made for this product in the shopping
+    await purchasesRepository.deleteAllPurchasesOfProduct(shoppingId, productToRemove.id)
 
     return res.status(200).send()
 }
