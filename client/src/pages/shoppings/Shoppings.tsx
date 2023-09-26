@@ -42,15 +42,12 @@ export const ShoppingsPage = ({ sessionService, shoppingsRepository }: ShoppingP
     return (
         <section className={cs.shoppingPageContent}>
 
-            {showNewForm && (
-                <NewShoppingModal
-                    shoppingsRepository={shoppingsRepository}
-                    onDismiss={() => { setShowNewForm(false) }}
-                    onShoppingAdded={() => { fetchShoppings() }}
-                    sessionService={sessionService}
-                />
-            )
-            }
+            <NewShoppingModal
+                isShown={showNewForm}
+                shoppingsRepository={shoppingsRepository}
+                onDismiss={() => { setShowNewForm(false) }}
+                onShoppingAdded={() => { fetchShoppings() }}
+            />
 
             <div className='pageHeader'>
                 <div className="pageTitleWithActionsContainer">

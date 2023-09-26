@@ -12,11 +12,11 @@ import { ISessionService } from "../../services/sessionService"
 import { IProductAssignmentsRepository, IPurchasesRepository, IShoppingsRepository, IUsersRepository } from "../../data/stbApi"
 import { IShopping, IUser } from "../../data/models/domain"
 
-export interface ShoppingDetailParams{
+export interface ShoppingDetailParams {
     id: number
 }
 
-export interface ShoppingDetailProps{
+export interface ShoppingDetailProps {
     sessionService: ISessionService
     shoppingsRepository: IShoppingsRepository
     usersRepository: IUsersRepository
@@ -35,10 +35,10 @@ export const ShoppingDetail = ({ sessionService, shoppingsRepository, usersRepos
     const [userIsAuthor, setUserIsAuthor] = useState(false)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [showAddUsersModal, setShowAddUsersModal] = useState(false)
-    
+
     const [showRemoveUserModal, setShowRemoveUserModal] = useState(false)
     const [userToBeRemoved, setUserToBeRemoved] = useState<IUser | null>(null)
-    
+
 
     useEffect(() => {
         fetchShoppingDetail()
@@ -46,62 +46,62 @@ export const ShoppingDetail = ({ sessionService, shoppingsRepository, usersRepos
     }, [id])
 
     useEffect(() => {
-        if(shopping != null){
+        if (shopping != null) {
             fetchShoppingCreator(shopping.creatorId)
         }
     }, [shopping])
 
     const fetchShoppingDetail = (): void => {
         shoppingsRepository.getShoppingById(id)
-        .then((shp) => {
-            setShopping(shp)
-            setUserIsAuthor(sessionService.getUserId() == shp.creatorId)
-        }).catch((err) => {
-            // TODO
-        })
+            .then((shp) => {
+                setShopping(shp)
+                setUserIsAuthor(sessionService.getUserId() == shp.creatorId)
+            }).catch((err) => {
+                // TODO
+            })
     }
 
     const fetchParticipants = (): void => {
         usersRepository.getUsersOfShopping(id)
-        .then((users) => {
-            setParticipants(users)
-        }).catch((err) => {
-            // TODO
-        })
+            .then((users) => {
+                setParticipants(users)
+            }).catch((err) => {
+                // TODO
+            })
     }
 
     const fetchShoppingCreator = (userId: number): void => {
         usersRepository.getUserById(userId)
-        .then((creator) => {
-            setShoppingCreator(creator)
-        }).catch((err) => {
-            // TODO
-        })
+            .then((creator) => {
+                setShoppingCreator(creator)
+            }).catch((err) => {
+                // TODO
+            })
     }
 
 
     const deleteShopping = (): void => {
         shoppingsRepository.deleteShopping(id)
-        .then((success) => {
-            if(success){
-                navigate(-1)
-            } else {
+            .then((success) => {
+                if (success) {
+                    navigate(-1)
+                } else {
+                    // TODO
+                }
+            }).catch((err) => {
                 // TODO
-            }
-        }).catch((err) => {
-            // TODO
-        })
+            })
     }
 
     const assignUsersToShopping = async (users: IUser[]): Promise<void> => {
         const addedUsers = []
-        for(let i = 0; i<users.length; i++){
+        for (let i = 0; i < users.length; i++) {
             const user = users[i]
             try {
                 await usersRepository.assignUserToShopping(user.id, id)
                 addedUsers.push(user)
             }
-            catch(err){
+            catch (err) {
                 console.log(err)
             }
         }
@@ -110,54 +110,53 @@ export const ShoppingDetail = ({ sessionService, shoppingsRepository, usersRepos
 
     const unassignUserFromShopping = async (user: IUser): Promise<void> => {
         usersRepository.unassignUserFromShopping(user.id, id)
-        .then((res) => {
-            const newParticipants = [...participants]
-            const index = newParticipants.indexOf(user)
-            newParticipants.splice(index, 1)
+            .then((res) => {
+                const newParticipants = [...participants]
+                const index = newParticipants.indexOf(user)
+                newParticipants.splice(index, 1)
 
-            setParticipants(newParticipants)
-            setUserToBeRemoved(null)
-        }).catch((err) => {
-            setUserToBeRemoved(null)
-            // TODO
-        })
+                setParticipants(newParticipants)
+                setUserToBeRemoved(null)
+            }).catch((err) => {
+                setUserToBeRemoved(null)
+                // TODO
+            })
     }
 
 
 
     return (
         <section className="shoppingDetailPageContent">
-            {showDeleteModal && (
-                <ConfirmationModal 
-                title={"Delete shopping"} 
+            <ConfirmationModal
+                isShown={showDeleteModal}
+                title={"Delete shopping"}
                 body={"Are you sure you want to delete this shopping? This action is irreversible."}
-                onDismiss={() => { 
+                onDismiss={() => {
                     setShowDeleteModal(false)
-                 }}
+                }}
                 onConfirm={() => {
                     setShowDeleteModal(false)
                     deleteShopping()
                 }} />
-            )}
 
-            {showRemoveUserModal && (
-                <ConfirmationModal 
-                title={"Remove participant"} 
+
+            <ConfirmationModal
+                isShown={showRemoveUserModal}
+                title={"Remove participant"}
                 body={`Are you sure you want remove ${userToBeRemoved?.username || "user"} from this shopping? All the user's purchases will be removed.`}
-                onDismiss={() => { 
+                onDismiss={() => {
                     setUserToBeRemoved(null)
                     setShowRemoveUserModal(false)
-                 }}
+                }}
                 onConfirm={() => {
                     setShowRemoveUserModal(false)
-                    if (userToBeRemoved){
+                    if (userToBeRemoved) {
                         unassignUserFromShopping(userToBeRemoved)
                     }
                 }} />
-            )}
 
-            {showAddUsersModal && (
-                <AddUsersModal 
+            <AddUsersModal
+                isShown={showAddUsersModal}
                 sessionService={sessionService}
                 usersRepository={usersRepository}
                 alreadyAssignedUsers={participants}
@@ -166,29 +165,28 @@ export const ShoppingDetail = ({ sessionService, shoppingsRepository, usersRepos
                     assignUsersToShopping(newUsers)
                     setShowAddUsersModal(false)
                 }} />
-            )}
 
             <div className={cs.shoppingDetailContainer}>
                 <div className={cs.containerHeader}>
                     <div className={cs.titleAndAuthorContainer}>
                         <h1 className={cs.name}>{shopping?.name}</h1>
-                        
+
                         {shopping?.description && (
                             <p>{shopping.description}</p>
                         )}
 
                         {userIsAuthor && (
-                        <button className={cs.deleteButton} onClick={(e) => {
-                            setShowDeleteModal(true)
-                        }}>
-                            <FontAwesomeIcon icon={faTrash} />
-                            Delete
-                        </button>
+                            <button className={cs.deleteButton} onClick={(e) => {
+                                setShowDeleteModal(true)
+                            }}>
+                                <FontAwesomeIcon icon={faTrash} />
+                                Delete
+                            </button>
                         )}
 
                         <span>{`By: ${shoppingCreator?.username} (${shoppingCreator?.email})`}</span>
                     </div>
-                    
+
                 </div>
 
                 <div className={cs.participants}>
@@ -201,27 +199,27 @@ export const ShoppingDetail = ({ sessionService, shoppingsRepository, usersRepos
                         </button>
                     </div>
                     <HorizontalUsersList
-                    sessionService={sessionService}
-                    users={participants}
-                    onUserClicked={(user) => {
-                        navigate(`/users/${user.id}`)
-                    }}
-                    onUserDelete={userIsAuthor ? (user) => {
-                        setUserToBeRemoved(user)
-                        setShowRemoveUserModal(true)
-                    }
-                    :
-                    null
-                    }/>
+                        sessionService={sessionService}
+                        users={participants}
+                        onUserClicked={(user) => {
+                            navigate(`/users/${user.id}`)
+                        }}
+                        onUserDelete={userIsAuthor ? (user) => {
+                            setUserToBeRemoved(user)
+                            setShowRemoveUserModal(true)
+                        }
+                            :
+                            null
+                        } />
                 </div>
 
             </div>
-            
+
             {shopping && (
                 <div className={cs.shoppingDetailPageContent}>
-                <ShoppingItemsList sessionService={sessionService} productAssignmentsRepository={productAssignmentsRepository} 
-                purchasesRepository={purchasesRepository} shopping={shopping} />
-            </div>
+                    <ShoppingItemsList sessionService={sessionService} productAssignmentsRepository={productAssignmentsRepository}
+                        purchasesRepository={purchasesRepository} shopping={shopping} />
+                </div>
             )}
         </section>
     )

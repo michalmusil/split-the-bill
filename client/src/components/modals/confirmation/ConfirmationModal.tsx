@@ -1,4 +1,5 @@
 import cs from "./ConfirmationModal.module.css"
+import { BaseModal } from "../base_modal/BaseModal"
 
 /**
  * Simple modal for yes/no question decisions
@@ -6,6 +7,7 @@ import cs from "./ConfirmationModal.module.css"
  * User can confirm or dismiss using respective buttons or dismiss the modal by clicking the background
  */
 export type ConfirmationModalProps = {
+    isShown: boolean
     title: string
     body: string
     onConfirm: () => void
@@ -14,13 +16,11 @@ export type ConfirmationModalProps = {
     onDismissText?: string
 }
 
-export const ConfirmationModal = ({ title, body, onConfirm, onDismiss, onConfirmText="Yes", onDismissText="No" }: ConfirmationModalProps) => {
+export const ConfirmationModal = ({ isShown, title, body, onConfirm, onDismiss, onConfirmText="Yes", onDismissText="No" }: ConfirmationModalProps) => {
 
     return (
-        <div className="modal">
-            <div className="modalOverlay" onClick={(e) => { onDismiss() }} />
-            <div className="modalContent">
-                <h1>{title}</h1>
+        <BaseModal isShown={isShown} onDismiss={onDismiss} dependencies={[]}>
+            <h1>{title}</h1>
                 <p>{body}</p>
                 <div className={cs.horizontalButtonContainer}>
                     <button className={cs.confirmButton} onClick={(e) => { onConfirm() }}>
@@ -30,7 +30,6 @@ export const ConfirmationModal = ({ title, body, onConfirm, onDismiss, onConfirm
                         {onDismissText}
                     </button>
                 </div>
-            </div>
-        </div>
+        </BaseModal>
     )
 }
