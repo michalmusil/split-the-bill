@@ -7,4 +7,6 @@ export default interface IProductAssignmentsRepository{
     assignProductToShopping(shoppingId: number, productAssignment: IPostProductAssignment): Promise<IProductAssignment>
     // Updates a specified product assignment of the shopping and returns updated product assignment
     updateProductAssignment(shoppingId: number, productAssignment: IPostProductAssignment): Promise<IProductAssignment>
+    // Removes a product specified by it's product name from the shopping (specified by the shopping id)
+    unassignProductFromShopping(shoppingId: number, productName: string): Promise<void>
 }

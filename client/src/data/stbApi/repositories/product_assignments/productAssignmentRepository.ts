@@ -45,4 +45,9 @@ export default class ProductAssignmentsRepository implements IProductAssignments
             unitPrice: productAssignment.unitPrice
         }
     }
+
+    async unassignProductFromShopping(shoppingId: number, productName: string): Promise<void> {
+        await axios.delete(routes.unassignProductFromShopping(shoppingId, productName),
+            { headers: { Authorization: this.sessionService.getUserToken() } })
+    }
 }

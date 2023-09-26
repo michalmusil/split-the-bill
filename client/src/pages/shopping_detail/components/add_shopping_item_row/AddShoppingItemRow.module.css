@@ -1,9 +1,6 @@
-
 .newItemInputRow td {
     border: 1px solid var(--shadow);
 }
-
-
 
 .verticalButtonContainer span {
     display: block;
@@ -17,7 +14,7 @@
     display: inline-block;
     width: 50px;
     height: 50px;
-    margin: 0 10px;
+    margin: 8px 10px;
     border-radius: 50%;
     padding: 10px;
     opacity: 80%;

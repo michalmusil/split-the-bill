@@ -12,6 +12,7 @@ export default {
 
     getProductAssignmentsByShoppingId: (id: number) => { return `${baseUrl}/shoppings/${id}/productAssignments` },
     addOrUpdateProductAssignment: (shoppingId: number) => { return `${baseUrl}/shoppings/${shoppingId}/addOrUpdateProduct` },
+    unassignProductFromShopping: (shoppingId: number, productName: string) => { return `${baseUrl}/shoppings/${shoppingId}/removeProduct?productName=${productName}` },
 
     assignUserToShopping: (userId: number, shoppingId: number) => { return `${baseUrl}/shoppings/${shoppingId}/assignUser?userId=${userId}` },
     unassignUserFromShopping: (userId: number, shoppingId: number) => { return `${baseUrl}/shoppings/${shoppingId}/unassignUser?userId=${userId}` },

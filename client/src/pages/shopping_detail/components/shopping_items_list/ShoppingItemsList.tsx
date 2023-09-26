@@ -73,7 +73,18 @@ export const ShoppingItemsList = ({ sessionService, productAssignmentsRepository
                                 productAssignmentRepository={productAssignmentsRepository}
                                 product={product}
                                 purchaseOfProduct={purchased}
-                                shopping={shopping} />
+                                shopping={shopping} 
+                                onProductUpdated={(newProduct) => {
+                                    const newProductAssignments = [...assignedProducts]
+                                    newProductAssignments[key] = newProduct
+                                    setAssignedProducts(newProductAssignments)
+                                }}
+                                onProductDeleted={() => {
+                                    const start = assignedProducts.slice(0, key)
+                                    const end = assignedProducts.slice(key+1, assignedProducts.length)
+                                    setAssignedProducts([...start, ...end])
+                                }}
+                                />
                         )
                         // return (
                         //     <tr key={key}>
