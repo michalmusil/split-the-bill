@@ -80,14 +80,18 @@ export const PurchaseItemModal = ({ isShown, productAssignment, purchasesReposit
     }
 
     const handlePurchaseQuantityUpdate = (user: IUserWithPurchase, quantityChange: number): void => {
-        const remainingToBePurchased = productAssignment.quantity - getQuantityPurchased()
+        const remainingToBePurchased = getRemainingQuantityToBePurchased()
         const newUserPurchaseQuantity = user.purchased + quantityChange
+        // User can't buy less than 0 products and can't buy more, than products remaining
         if (newUserPurchaseQuantity < 0 || quantityChange > remainingToBePurchased) {
-            // User can't buy less than 0 products and can't buy more, than products remaining
             return
         }
         user.purchased = newUserPurchaseQuantity
         setUserPurchases([...userPurchases])
+    }
+
+    const getRemainingQuantityToBePurchased = (): number =>{
+        return productAssignment.quantity - getQuantityPurchased()
     }
 
     const updateProductPurchases = async (): Promise<void> => {
@@ -101,7 +105,7 @@ export const PurchaseItemModal = ({ isShown, productAssignment, purchasesReposit
             }
             calls.push(
                 purchasesRepository.purchaseProduct(post)
-                    .catch((err) => { 
+                    .catch((err) => {
                         // TODO
                     })
             )
@@ -140,19 +144,30 @@ export const PurchaseItemModal = ({ isShown, productAssignment, purchasesReposit
                             <FontAwesomeIcon className={cs.userIcon} icon={faUser} />
                             <strong>{userPurchase.username} </strong>
                             <div className={cs.spacer} />
+
                             <div className={cs.purchasedQuantityContainer}>
-                                <button className={cs.purchaseLessButton} onClick={(e) => {
-                                    handlePurchaseQuantityUpdate(userPurchase, -1)
-                                }}>
-                                    <FontAwesomeIcon icon={faMinus} />
-                                </button>
+                                <div className={cs.purchasedQuantityStepper}>
+                                    <button className={cs.purchaseLessButton} onClick={(e) => {
+                                        handlePurchaseQuantityUpdate(userPurchase, -1)
+                                    }}>
+                                        <FontAwesomeIcon icon={faMinus} />
+                                    </button>
 
-                                <span>{userPurchase.purchased}</span>
+                                    <span>{userPurchase.purchased}</span>
 
-                                <button className={cs.purchaseMoreButton} onClick={(e) => {
-                                    handlePurchaseQuantityUpdate(userPurchase, 1)
+                                    <button className={cs.purchaseMoreButton} onClick={(e) => {
+                                        handlePurchaseQuantityUpdate(userPurchase, 1)
+                                    }}>
+                                        <FontAwesomeIcon icon={faPlus} />
+                                    </button>
+                                </div>
+
+                                <button className={cs.purchaseRestButton} onClick={(e) => {
+                                    handlePurchaseQuantityUpdate(userPurchase, getRemainingQuantityToBePurchased())
                                 }}>
-                                    <FontAwesomeIcon icon={faPlus} />
+                                    <span>
+                                        Purchase rest
+                                    </span>
                                 </button>
                             </div>
                         </div>
@@ -162,7 +177,9 @@ export const PurchaseItemModal = ({ isShown, productAssignment, purchasesReposit
                     await updateProductPurchases()
                     onConfirm()
                 }}>
-                    Confirm
+                    <span>
+                        Confirm
+                    </span>
                 </button>
             </div>
 

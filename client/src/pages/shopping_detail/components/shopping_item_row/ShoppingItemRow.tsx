@@ -8,33 +8,39 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { faPencil, faCheck, faCartShopping, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { ConfirmationModal } from "../../../../components/modals/confirmation/ConfirmationModal"
-import { PurchaseItemModal } from "../purchase_item_modal/PurchaseItemModal"
 import { ISessionService } from "../../../../services/sessionService"
 
+/**
+ * @param productAssignmentRepository Is needed for when user updates quantity or unit price of this product assignment or deletes it
+ * @param shopping Parent shopping of this product assignment (needed for contextual information)
+ * @param product Product assignment to display and/or edit
+ * @param purchaseOfProduct Existing purchases of the displayed product assignment. Can be null if no quantity has been purchased yet
+ * @param onProductUpdated Callback for when unit price or quantity of the product assignment gets updated
+ * @param onProductDeleted Callback for when the displayed product assignment gets deleted
+ * @param onPurchaseUpdated Callback for when purchase of the product gets updated (might happen for example when unit price changes)
+ * @param onPurchaseInitiated Callback for when user clicks on purchase button - a signal that user wants to purchase some quantity of this product
+ */
 export interface ShoppingItemRowProps {
-    sessionService: ISessionService
     productAssignmentRepository: IProductAssignmentsRepository
-    purchasesRepository: IPurchasesRepository
     shopping: IShopping
-    shoppingParticipants: IUser[]
     product: IProductAssignment
     purchaseOfProduct: IPurchaseOfProduct | null
     onProductUpdated: (updatedProduct: IProductAssignment) => void
     onProductDeleted: () => void
     onPurchaseUpdated: () => void
+    onPurchaseInitiated: (product: IProductAssignment, purchase: IPurchaseOfProduct | null) => void
 }
 
 const quantityInputId = "quantityInput"
 const unitPriceInputId = "unitPriceInput"
 
-export const ShoppingItemRow = ({ sessionService, productAssignmentRepository, purchasesRepository,
-     shopping, shoppingParticipants, product, purchaseOfProduct, onProductUpdated, onProductDeleted, onPurchaseUpdated }: ShoppingItemRowProps) => {
+export const ShoppingItemRow = ({ productAssignmentRepository, shopping, product, purchaseOfProduct, 
+    onProductUpdated, onProductDeleted, onPurchaseUpdated, onPurchaseInitiated }: ShoppingItemRowProps) => {
     const [rowState, setRowState] = useState<ShoppingItemRowState>(ShoppingItemRowState.IDLE)
     const [editableQuantity, setEditableQuantity] = useState<number>(product.quantity)
     const [editableUnitPrice, setEditableUnitPrice] = useState<number | null>(product.unitPrice)
 
     const [showDeleteItemModal, setShowDeleteItemModal] = useState(false)
-    const [showPurchaseItemModal, setShowPurchaseItemModal] = useState(false)
 
     const quantityInputRef = useRef(null)
     const unitPriceInputRef = useRef(null)
@@ -140,23 +146,6 @@ export const ShoppingItemRow = ({ sessionService, productAssignmentRepository, p
                 setShowDeleteItemModal(false)
             }} />
 
-        <PurchaseItemModal
-            isShown={showPurchaseItemModal}
-            existingPurchase={purchaseOfProduct}
-            participantsOfShopping={shoppingParticipants}
-            productAssignment={product}
-            purchasesRepository={purchasesRepository}
-            sessionService={sessionService}
-            shopping={shopping}
-            onDismiss={() => {
-                setShowPurchaseItemModal(false)
-            }}
-            onConfirm={() => {
-                onPurchaseUpdated()
-                setShowPurchaseItemModal(false)
-            }}
-        />
-
         <tr className={cs.shoppingItemRow}>
             <td>{product.name}</td>
 
@@ -235,7 +224,7 @@ export const ShoppingItemRow = ({ sessionService, productAssignmentRepository, p
             <td>
                 <div className={`${cs.actionIcon} ${cs.purchaseIcon}`}
                     onClick={(e) => {
-                        setShowPurchaseItemModal(true)
+                        onPurchaseInitiated(product, purchaseOfProduct)
                     }}>
                     <FontAwesomeIcon icon={faCartShopping} />
                 </div>

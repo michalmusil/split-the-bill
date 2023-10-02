@@ -23,6 +23,11 @@
     margin-bottom: 40px;
 }
 
+.shoppingItemInfoTable thead th {
+    background-color: var(--primary);
+    padding: 5px 0;
+}
+
 .shoppingItemInfoTable tbody td{
     padding-top: 13px;
 }
@@ -46,8 +51,10 @@
     flex: 1;
 }
 
-.purchasedQuantityContainer {
+.purchasedQuantityStepper {
     display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
 }
 
 .purchasedQuantityContainer span{
@@ -69,13 +76,17 @@
     border-radius: 50%
 }
 
-.purchaseMoreButton {
+.purchaseMoreButton, .purchaseRestButton {
     background-color: var(--primary);
     box-shadow: 0px 0px 1px var(--primary);
 }
 
-.purchaseMoreButton:hover{
+.purchaseMoreButton:hover, .purchaseRestButton:hover{
     box-shadow: 0px 0px 10px var(--primary);
+}
+
+.purchaseRestButton {
+    font-size: 0.8rem;
 }
 
 .purchaseLessButton {
