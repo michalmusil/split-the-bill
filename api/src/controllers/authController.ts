@@ -1,14 +1,19 @@
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
-const dotenv = require('dotenv')
-const usersRepository = require('../models/repositories/usersRepository')
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
+import dotenv from 'dotenv'
+import UsersRepository from '../repositories/usersRepository.js'
+import { Request, Response } from 'express'
+import SessionUser from 'models/sessionUser.js'
 
 dotenv.config()
 
-const login = async (req, res) => {
-    const { email, password } = req.body
+const usersRepository = new UsersRepository();
 
-    if (email == null || password == null){
+export async function login(req: Request, res: Response) {
+    const email = req.body["email"] as string | undefined
+    const password = req.body["password"] as string | undefined
+
+    if (!email || !password){
         return res.status(400).send({ message: 'You must input both email and password' })
     }
 
@@ -29,13 +34,13 @@ const login = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' })
     }
 
-    const userForToken = {
+    const userForToken: SessionUser = {
         id: foundUser.id,
         username: foundUser.username,
         email: foundUser.email
     }
 
-    const accessToken = jwt.sign(userForToken, process.env.JWT_ACCESS_SECRET, { expiresIn: '10d' })
+    const accessToken = jwt.sign(userForToken, process.env.JWT_ACCESS_SECRET!, { expiresIn: '10d' })
 
     res.status(200).send({
         user: userForToken,
@@ -43,8 +48,10 @@ const login = async (req, res) => {
     })
 }
 
-const register = async (req, res) => {
-    const { username, email, password } = req.body
+export async function register(req: Request, res: Response) {
+    const username = req.body["username"] as string | undefined
+    const email = req.body["email"] as string | undefined
+    const password = req.body["password"] as string | undefined
 
     if (!(username && email && password)){
         return res.status(400).send()
@@ -61,20 +68,19 @@ const register = async (req, res) => {
         const numberOfSaltRounds = 10
         passwordHash = await bcrypt.hash(password, numberOfSaltRounds)
     } catch(ex){
-        return res.status(500).send({ message: 'Could not process the new password' })
+        return res.status(500).send({ message: 'Something went wrong while creating the user' })
     }
 
     const newUserId = await usersRepository.addUser(username, email, passwordHash)
+    if(newUserId == null){
+        return res.status(500).send({ message: 'Something went wrong while creating the user' })
+    }
+
     const newUser = await usersRepository.getUserById(newUserId)
     
     res.status(201).send({
-        id: newUser.id,
-        username: newUser.username,
-        email: newUser.email
+        id: newUser!.id,
+        username: newUser!.username,
+        email: newUser!.email
     })
-}
-
-module.exports = {
-    login,
-    register
 }

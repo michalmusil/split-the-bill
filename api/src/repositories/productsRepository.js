@@ -1,4 +1,4 @@
-const database = require('../database')
+const database = require('../models/database')
 
 const whereClauseBase = "WHERE 1=1" // The where clause base needs to be valid in case no other clauses are added, thus begins with 1=1
 
